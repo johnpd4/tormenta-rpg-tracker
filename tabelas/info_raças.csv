@@ -1,0 +1,20 @@
+raça,bonus_for,bonus_des,bonus_con,bonus_int,bonus_sab,bonus_car,pnts_livres,restrição_pnts_livres,permite_mais_2
+Humano,0,0,0,0,0,0,3,Nenhuma,Não
+Anão,0,-1,2,0,1,0,0,Nenhuma,Não
+Dahllan,0,1,0,-1,2,0,0,Nenhuma,Não
+Elfo,0,1,-1,2,0,0,0,Nenhuma,Não
+Goblin,0,2,0,1,0,-1,0,Nenhuma,Não
+Lefou,0,0,0,0,0,-1,3,Car,Não
+Minotauro,2,0,1,0,-1,0,0,Nenhuma,Não
+Qareen,0,0,0,1,-1,2,0,Nenhuma,Não
+Golem,2,0,1,0,0,-1,0,Nenhuma,Não
+Hynne,-1,2,0,0,0,1,0,Nenhuma,Não
+Kliren,-1,0,0,2,0,1,0,Nenhuma,Não
+Medusa,0,2,0,0,0,1,0,Nenhuma,Não
+Osteon,0,0,-1,0,0,0,3,Con,Não
+Sereia/Tritão,0,0,0,0,0,0,3,Nenhuma,Não
+Sílfide,-2,1,0,0,0,2,0,Nenhuma,Não
+Suraggel (aggelus),0,0,0,0,2,1,0,Nenhuma,Não
+Suraggel (sulfure),0,2,0,1,0,0,0,Nenhuma,Não
+Trog,1,0,2,-1,0,0,0,Nenhuma,Não
+Nenhum,0,0,0,0,0,0,0,Nenhuma,Não

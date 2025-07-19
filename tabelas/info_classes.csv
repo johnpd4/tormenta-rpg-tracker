@@ -1,0 +1,16 @@
+classe,pv_base,pv_por_nível,pm_por_nível,pericias_obg,pericias_op,pericias_alt,pericias_obg_str,pericias_op_str,pericias_alt_str
+Arcanista,8,2,6,"Misticismo, Vontade","Conhecimento, Diplomacia, Enganação, Guerra, Iniciativa, Intimidação, Intuição, Investigação, Nobreza, Ofício, Percepção",Nenhuma,Misticismo|Vontade,Conhecimento|Diplomacia|Enganação|Guerra|Iniciativa|Intimidação|Intuição|Investigação|Nobreza|Ofício|Percepção,Nenhuma
+Bárbaro,24,6,3,,,,#VALUE!,#VALUE!,#VALUE!
+Bardo,12,3,4,,,,#VALUE!,#VALUE!,#VALUE!
+Bucaneiro,16,4,3,,,,#VALUE!,#VALUE!,#VALUE!
+Caçador,16,4,4,,,,#VALUE!,#VALUE!,#VALUE!
+Cavaleiro,20,5,3,,,,#VALUE!,#VALUE!,#VALUE!
+Clérigo,16,4,5,,,,#VALUE!,#VALUE!,#VALUE!
+Druida,16,4,4,,,,#VALUE!,#VALUE!,#VALUE!
+Guerreiro,20,5,3,,,,#VALUE!,#VALUE!,#VALUE!
+Inventor,12,3,4,,,,#VALUE!,#VALUE!,#VALUE!
+Ladino,12,3,4,,,,#VALUE!,#VALUE!,#VALUE!
+Lutador,20,5,3,,,,#VALUE!,#VALUE!,#VALUE!
+Nobre,16,4,4,,,,#VALUE!,#VALUE!,#VALUE!
+Paladino,20,5,3,,,,#VALUE!,#VALUE!,#VALUE!
+Nenhum,0,0,0,,,,#VALUE!,#VALUE!,#VALUE!
