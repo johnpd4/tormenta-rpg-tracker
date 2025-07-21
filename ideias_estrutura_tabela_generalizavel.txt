@@ -1,0 +1,40 @@
+Ideia de estrutura de tabela generalizavel
+NOTAS: um poder podedar mais de um bônus, então cada poder poderia ter mais de uma linha na tabela.
+
+What?: Brado Assutador (bárbaro)
+
+POSSIVEIS PROBLEMAS: Especialista em Escola (arcanista), Armadilheiro (caçador), Título (cavaleiro e nobre), Autoridade Eclesiática (clérigo), Mestre Celebrante (clérigo), Mestre em Arma (guerreiro), Alquimista Iniciado (inventor), Armeiro (inventor), Balística (inventor), Mestre Alquimista (inventor), Poder de Paladino (paladino), Disparo Preciso (geral, combate), Encouraçado (geral, combate), Estilo de Arma e Escudo (geral, combate), Foco em Arma (geral, combate), Ao Sabor do Destino (geral, destino), Foco em Perícia (geral, destino), Parceiro (geral, destino), Celebrar Ritual (geral, magia), Escrever Pergaminho (geral, magia), Foco em Magia (geral, magia), Magia Acelerada (geral, magia), Preparar Poção (geral, magia), Teurgista Místico (concedido, Wynna), Poderes de tormenta que necessitam tantos outro poderes de tormenta (tormenta)
+
+nome: Nome do bônus.
+
+origem: De onde o bônus vem. (poderes, raça, classe, etc...)
+
+prioridade: Prioridade ao carregar os bônus personagem. A ideia é dar maior prioridade pra coisas que mexem nos atributos principais, pois muitos outros poderes dependem disso.
+
+nome_bônus: Onde o valor bônus deve ser adicionado.
+
+valor_bônus: Valor do bônus. Seria ideal poder colocar uma fórmula aqui.
+
+efeito_bônus: Efeito dado por algum bônus. Acho que usar só strings pra display.
+
+condição: Condição para o bônus ser ativado.
+
+restrição_classe: Classe a qual esse bônus é restrito.
+
+restrição_raça: Raça a qual esse bônus é restrito.
+
+restrição_nível: Nível mínimo para esse bônus. Note que isso em conjunto com a restrição de classe permite ambos restringir só nível, só classe ou ambos.
+
+restrição_poderes: Poderes pré-requisitos para poder pegar esse bônus.
+
+restrição_divindade: Divindade a qual esse bônus é restrito.
+
+restrição_perícia: Perícia necessária ser treinado para ter esse bônus.
+
+restrição_magia: Magia necessária ser treinado para ter esse bônus.
+
+restrição_atributo:
+
+automatico: Se o bônus é automáticamente dado ao se conseguir os pré-requisitos ou deve ser selecionado.
+
+referência: Livro e página daonde a info foi tirada.

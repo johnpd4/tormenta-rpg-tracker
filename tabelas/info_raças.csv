@@ -1,4 +1,4 @@
-raça,bonus_for,bonus_des,bonus_con,bonus_int,bonus_sab,bonus_car,pnts_livres,restrição_pnts_livres,permite_mais_2
+raça,for,des,con,int,sab,car,pontos_livres,restrição_pontos_livres,permite_mais_2
 Humano,0,0,0,0,0,0,3,Nenhuma,Não
 Anão,0,-1,2,0,1,0,0,Nenhuma,Não
 Dahllan,0,1,0,-1,2,0,0,Nenhuma,Não
