@@ -17,8 +17,8 @@ class personagem:
         self.divindade = None
         self.raça = None
         self.classes = dict()
-        self.atributos = {"for": -9999, "des": -9999, "con": -9999, "int": -9999, "sab": -9999, "car": -9999}
-        self.tabelas_origem = list()
+        self.atributos = {"for": None, "des": None, "con": None, "int": None, "sab": None, "car": None}
+        self.tabela_origem = self.inicializa_tabela_de_origem()
 
     def print_aviso(self, aviso):
         print("\033[91m" + aviso + "\033[0m")
@@ -83,7 +83,6 @@ class personagem:
             #print("contador_níveis:", contador_níveis)
             if contador_níveis > 20:
                 raise Exception("Níveis total de todas as classes não podem ser maiores que 20!")
-
     def calcula_pv_das_classes(self):
         """
         Calcula a quantidade de pv's de um jogador.
@@ -147,10 +146,56 @@ class personagem:
                 vetor_auxiliar.append("Opcional")
             else:
                 vetor_auxiliar.append("-")
-        
+
         tabela_pericias["pericias_do_jogador"] = vetor_auxiliar
-        
+
         return(tabela_pericias)
+
+    def inicializa_tabela_de_origem(self):
+        return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "nome_bônus", "valor_bônus",
+                                        "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
+                                        "restrição_poderes", "restrição_divindade", "restrição_perícia", "restrição_magia",
+                                        "restrição_atributo"]))
+
+    # TODO: Lembrar de atualizar essa porra horrível
+    def adiciona_linha_tabela_de_origem(self,
+                                        nome,
+                                        origem,
+                                        prioridade,
+                                        automático,
+                                        referência,
+                                        nome_bônus = None,
+                                        valor_bônus = None,
+                                        efeito_bônus = None,
+                                        condição = None,
+                                        restrição_classe = None,
+                                        restrição_raça = None,
+                                        restrição_nível = None,
+                                        restrição_poderes = None,
+                                        restrição_divindade = None,
+                                        restrição_perícia = None,
+                                        restrição_magia = None,
+                                        restrição_atributo = None):
+        dict_para_df = {"nome": [nome],
+                        "origem": [origem],
+                        "prioridade": [prioridade],
+                        "nome_bônus": [nome_bônus],
+                        "valor_bônus": [valor_bônus],
+                        "efeito_bônus": [efeito_bônus],
+                        "condição": [condição],
+                        "restrição_classe": [restrição_classe],
+                        "restrição_raça": [restrição_raça],
+                        "restrição_nível": [restrição_nível],
+                        "restrição_poderes": [restrição_poderes],
+                        "restrição_divindade": [restrição_divindade],
+                        "restrição_perícia": [restrição_perícia],
+                        "restrição_magia": [restrição_magia],
+                        "restrição_atributo": [restrição_atributo],
+                        "automático": [automático],
+                        "referência": [referência]}
+        
+        tabela_origem = pd.DataFrame.from_dict(data = dict_para_df)
+        self.tabela_origem = pd.concat([self.tabela_origem, tabela_origem], ignore_index = True)
         
     def calcula_atributos_iniciais(self, método: str, valores: dict):
         """
@@ -163,6 +208,8 @@ class personagem:
         # Checar se no dicionario tem os stats certos
         if self.atributos.keys() != valores.keys():
             raise Exception("Dicionário de valores usados para calcular os atributos não contém as chaves corretas!")
+
+        atributos_calculados = dict()
 
         # Método dos pontos
         if método == "pontos":            
@@ -185,7 +232,7 @@ class personagem:
                     case _:
                         raise Exception("Valor inválido ao calcular os atributos básicos com o método de pontos!")
                 
-                self.atributos.update({atributo: valor})
+                atributos_calculados.update({atributo: valor})
                 
             # Se os números são sub-ótimos mandar um aviso, se forem melhores do que poderia
             # ser possível dar um erro
@@ -200,12 +247,22 @@ class personagem:
                 if valor < 3 or valor > 18:
                     raise Exception("Valor inválido para calcular os atributos básicos com o método das rolagens!")
 
-                self.atributos.update({atributo: math.floor(max((valor - 10) / 2, -2))})
+                atributos_calculados.update({atributo: math.floor(max((valor - 10) / 2, -2))})
 
-            if sum(self.atributos.values()) < 6:
+            if sum(atributos_calculados.values()) < 6:
                 self.print_aviso("Soma dos atributos rolados foi menor que 6, pode-se re-rolar o menor")
         else:
             raise Exception("Método de cálculo de atributos básicos inválido!")
+
+        for atributo, valor in atributos_calculados.items():
+            self.atributos.update({atributo: valor})
+            self.adiciona_linha_tabela_de_origem(nome = "".join(["Atributos básicos do método de ", método]),
+                                                origem = "".join([método.capitalize(), " iniciais"]),
+                                                prioridade = 1,
+                                                nome_bônus = atributo,
+                                                valor_bônus = valor,
+                                                automático = "Sim",
+                                                referência = "Tormenta 20: Jogo do Ano, página 17")
 
     def adiciona_atributos_raça(self, pontos_livres: Union[dict, None]):
         if self.raça == None:
@@ -225,13 +282,19 @@ class personagem:
         # Pegar os atributos de raça
         tabela_raças = pd.read_csv("./tabelas/info_raças.csv")
         atributos_raça = tabela_raças[tabela_raças["raça"] == self.raça]
+        print(atributos_raça)
 
         quantidade_pontos_livres = atributos_raça["pontos_livres"].tolist().pop()
         permite_mais_2 = atributos_raça["permite_mais_2"].tolist().pop()
         restrição_pontos_livres = atributos_raça["restrição_pontos_livres"].tolist().pop()
+        referência = atributos_raça["referência"].tolist().pop()
 
-        atributos_raça = {"for": atributos_raça["for"][0], "des": atributos_raça["des"][0], "con": atributos_raça["con"][0],
-                          "int": atributos_raça["int"][0], "sab": atributos_raça["sab"][0], "car": atributos_raça["car"][0]}
+        print("atributos_raça['for']: ", atributos_raça["for"])
+        print("atributos_raça['for'].tolist().pop(): ", atributos_raça["for"].tolist().pop())
+
+        atributos_raça = {"for": atributos_raça["for"].tolist().pop(), "des": atributos_raça["des"].tolist().pop(),
+                          "con": atributos_raça["con"].tolist().pop(), "int": atributos_raça["int"].tolist().pop(),
+                          "sab": atributos_raça["sab"].tolist().pop(), "car": atributos_raça["car"].tolist().pop()}
 
         if permite_mais_2 != "Sim" and valor_dois_presente:
             raise Exception("Tentativa de atribuir um valor de ponto livre maior que um quando a raça não permite!")
@@ -246,17 +309,42 @@ class personagem:
                 self.print_aviso("Pontos livres alocados para um atributo inválido para essa raça. Pontos não foram atribuídos")
                 continue
             self.atributos[atributo] += atributos_raça[atributo] + pontos_livres[atributo]
+            if atributos_raça[atributo] != 0:
+                self.adiciona_linha_tabela_de_origem(nome = "".join([atributo.capitalize(), " da raça ", self.raça]),
+                                                    origem = "".join(["Raça ", self.raça]),
+                                                    prioridade = 1,
+                                                    nome_bônus = atributo,
+                                                    valor_bônus = atributos_raça[atributo],
+                                                    restrição_raça = self.raça,
+                                                    automático = "Sim",
+                                                    referência = referência)
+            if pontos_livres[atributo] != 0:
+                self.adiciona_linha_tabela_de_origem(nome = "".join([atributo.capitalize(), " de pontos livres da raça ", self.raça]),
+                                                    origem = "".join(["Raça ", self.raça]),
+                                                    prioridade = 1,
+                                                    nome_bônus = atributo,
+                                                    valor_bônus = pontos_livres[atributo],
+                                                    restrição_raça = self.raça,
+                                                    automático = "Sim",
+                                                    referência = referência)
+
+
 
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
 
 teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "des": 17, "int": 13, "con": 13, "sab": 8, "car": 18})
 
-teste.adiciona_raça("Humano")
-teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "int": 0, "con": 1, "sab": 0, "car": 0})
+teste.adiciona_raça("Elfo")
+#teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "int": 0, "con": 1, "sab": 0, "car": 0})
+teste.adiciona_atributos_raça(pontos_livres = None)
 print(teste.atributos)
 
 for atributo, valor in teste.atributos.items():
     print(atributo, ": ", valor)
+
+print("teste.tabela_origem: \n", teste.tabela_origem)
+
+teste.tabela_origem.to_csv("tabela_teste.csv")
 
 # print(teste.perícias_das_classes())
 

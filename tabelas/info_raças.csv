@@ -1,20 +1,20 @@
-raça,for,des,con,int,sab,car,pontos_livres,restrição_pontos_livres,permite_mais_2
-Humano,0,0,0,0,0,0,3,Nenhuma,Não
-Anão,0,-1,2,0,1,0,0,Nenhuma,Não
-Dahllan,0,1,0,-1,2,0,0,Nenhuma,Não
-Elfo,0,1,-1,2,0,0,0,Nenhuma,Não
-Goblin,0,2,0,1,0,-1,0,Nenhuma,Não
-Lefou,0,0,0,0,0,-1,3,Car,Não
-Minotauro,2,0,1,0,-1,0,0,Nenhuma,Não
-Qareen,0,0,0,1,-1,2,0,Nenhuma,Não
-Golem,2,0,1,0,0,-1,0,Nenhuma,Não
-Hynne,-1,2,0,0,0,1,0,Nenhuma,Não
-Kliren,-1,0,0,2,0,1,0,Nenhuma,Não
-Medusa,0,2,0,0,0,1,0,Nenhuma,Não
-Osteon,0,0,-1,0,0,0,3,Con,Não
-Sereia/Tritão,0,0,0,0,0,0,3,Nenhuma,Não
-Sílfide,-2,1,0,0,0,2,0,Nenhuma,Não
-Suraggel (aggelus),0,0,0,0,2,1,0,Nenhuma,Não
-Suraggel (sulfure),0,2,0,1,0,0,0,Nenhuma,Não
-Trog,1,0,2,-1,0,0,0,Nenhuma,Não
-Nenhum,0,0,0,0,0,0,0,Nenhuma,Não
+raça,for,des,con,int,sab,car,pontos_livres,restrição_pontos_livres,permite_mais_2,referência
+Humano,0,0,0,0,0,0,3,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 19"
+Anão,0,-1,2,0,1,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 20"
+Dahllan,0,1,0,-1,2,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 21"
+Elfo,0,1,-1,2,0,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 22"
+Goblin,0,2,0,1,0,-1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 23"
+Lefou,0,0,0,0,0,-1,3,car,Não,"Tormenta 20: Jogo do Ano, página 24"
+Minotauro,2,0,1,0,-1,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 25"
+Qareen,0,0,0,1,-1,2,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 26"
+Golem,2,0,1,0,0,-1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 27"
+Hynne,-1,2,0,0,0,1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 27"
+Kliren,-1,0,0,2,0,1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 28"
+Medusa,0,2,0,0,0,1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 28"
+Osteon,0,0,-1,0,0,0,3,con,Não,"Tormenta 20: Jogo do Ano, página 29"
+Sereia/Tritão,0,0,0,0,0,0,3,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 29"
+Sílfide,-2,1,0,0,0,2,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 30"
+Suraggel (aggelus),0,0,0,0,2,1,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 30"
+Suraggel (sulfure),0,2,0,1,0,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 30"
+Trog,1,0,2,-1,0,0,0,Nenhuma,Não,"Tormenta 20: Jogo do Ano, página 31"
+Nenhuma,0,0,0,0,0,0,0,Nenhuma,Não,Nenhuma

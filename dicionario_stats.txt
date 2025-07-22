@@ -4,10 +4,14 @@ con - Modificador de Constituição
 int - Modificador de Inteligência
 sab - Modificador de Sabedoria
 car - Modificador de Carisma
+
 pv - Pontos de Vida
 pm - Pontos de mana
 defesa - Pontos de Defesa, Classe de Armadura
 ataque - Pontos Bônus nas Jogadas de Ataque
+penalidade_armadura - Penalidade de Armadura
+deslocamento - Deslocamento
+
 acrobacia - Pontos na Perícia de Acrobacia
 adestramento – Pontos na Perícia de Adestramento
 atletismo – Pontos na Perícia de Atletismo
