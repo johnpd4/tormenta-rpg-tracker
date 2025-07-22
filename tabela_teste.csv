@@ -1,4 +1,4 @@
-,nome,origem,prioridade,automático,referência,nome_bônus,valor_bônus,efeito_bônus,condição,restrição_classe,restrição_raça,restrição_nível,restrição_poderes,restrição_divindade,restrição_perícia,restrição_magia,restrição_atributo
+,nome,origem,prioridade,automático,referência,bônus_em,valor_bônus,efeito_bônus,condição,restrição_classe,restrição_raça,restrição_nível,restrição_poderes,restrição_divindade,restrição_perícia,restrição_magia,restrição_atributo
 0,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",for,4,,,,,,,,,,
 1,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",des,3,,,,,,,,,,
 2,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",int,1,,,,,,,,,,

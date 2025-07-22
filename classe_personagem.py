@@ -28,6 +28,12 @@ class personagem:
         if classe == None:
             raise Exception("Tentativa de acessar classe principal encontrou None")
         return(classe)
+
+    def get_nível_de_classe(self, classe_match):
+        for classe, nível in self.classes.items():
+            if classe == classe_match:
+                return(nível)
+        return(None)
     
     def adiciona_raça(self, raça: str):
         """
@@ -83,6 +89,7 @@ class personagem:
             #print("contador_níveis:", contador_níveis)
             if contador_níveis > 20:
                 raise Exception("Níveis total de todas as classes não podem ser maiores que 20!")
+
     def calcula_pv_das_classes(self):
         """
         Calcula a quantidade de pv's de um jogador.
@@ -152,7 +159,7 @@ class personagem:
         return(tabela_pericias)
 
     def inicializa_tabela_de_origem(self):
-        return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "nome_bônus", "valor_bônus",
+        return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "bônus_em", "valor_bônus",
                                         "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
                                         "restrição_poderes", "restrição_divindade", "restrição_perícia", "restrição_magia",
                                         "restrição_atributo"]))
@@ -164,7 +171,7 @@ class personagem:
                                         prioridade,
                                         automático,
                                         referência,
-                                        nome_bônus = None,
+                                        bônus_em = None,
                                         valor_bônus = None,
                                         efeito_bônus = None,
                                         condição = None,
@@ -179,7 +186,7 @@ class personagem:
         dict_para_df = {"nome": [nome],
                         "origem": [origem],
                         "prioridade": [prioridade],
-                        "nome_bônus": [nome_bônus],
+                        "bônus_em": [bônus_em],
                         "valor_bônus": [valor_bônus],
                         "efeito_bônus": [efeito_bônus],
                         "condição": [condição],
@@ -259,7 +266,7 @@ class personagem:
             self.adiciona_linha_tabela_de_origem(nome = "".join(["Atributos básicos do método de ", método]),
                                                 origem = "".join([método.capitalize(), " iniciais"]),
                                                 prioridade = 1,
-                                                nome_bônus = atributo,
+                                                bônus_em = atributo,
                                                 valor_bônus = valor,
                                                 automático = "Sim",
                                                 referência = "Tormenta 20: Jogo do Ano, página 17")
@@ -313,7 +320,7 @@ class personagem:
                 self.adiciona_linha_tabela_de_origem(nome = "".join([atributo.capitalize(), " da raça ", self.raça]),
                                                     origem = "".join(["Raça ", self.raça]),
                                                     prioridade = 1,
-                                                    nome_bônus = atributo,
+                                                    bônus_em = atributo,
                                                     valor_bônus = atributos_raça[atributo],
                                                     restrição_raça = self.raça,
                                                     automático = "Sim",
@@ -322,12 +329,42 @@ class personagem:
                 self.adiciona_linha_tabela_de_origem(nome = "".join([atributo.capitalize(), " de pontos livres da raça ", self.raça]),
                                                     origem = "".join(["Raça ", self.raça]),
                                                     prioridade = 1,
-                                                    nome_bônus = atributo,
+                                                    bônus_em = atributo,
                                                     valor_bônus = pontos_livres[atributo],
                                                     restrição_raça = self.raça,
                                                     automático = "Sim",
                                                     referência = referência)
 
+    def poderes_disponíveis(self):
+        """
+        Pegar a giga-gigante tabela de todos os poderes e fazer um subset daqueles que estão
+        disponíveis para o personagem atual
+        """
+        tabela_poderes = pd.read_csv("./tabelas/info_poderes.csv")
+        
+        # Iterar pelas linhas para testar as restrições
+        for _, row in tabela_poderes.iterrows():
+
+            # Assuma que o poder não é restrito
+            poder_restrito = False
+
+            # TODO: this code sucks and doesnt work :)
+            # tem q re-pensar como fazer os checks de restrição, principalmente
+            # quando se fala de níveis e classes
+            # Testar a restrição de classe
+            for classe in self.classes.keys():
+                if classe not in row["restrição_classe"]:
+                    poder_restrito = True
+
+            # Testar a restrição de nível
+            for nível in self.classes.values():
+                if nível < row["restrição_nível"]:
+                    print("".join(["Poder ", row["nome"], " restrito por nível muito baixo!\n Necessário: ",
+                        row["restrição_nível"], "Encontrado: ", nível]))
+                    poder_restrito = True
+            
+            if not poder_restrito:
+                self.tabela_origem = pd.concat([self.tabela_origem, row], ignore_index = True)
 
 
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
@@ -337,20 +374,27 @@ teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "de
 teste.adiciona_raça("Elfo")
 #teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "int": 0, "con": 1, "sab": 0, "car": 0})
 teste.adiciona_atributos_raça(pontos_livres = None)
-print(teste.atributos)
+#print(teste.atributos)
 
-for atributo, valor in teste.atributos.items():
-    print(atributo, ": ", valor)
+# for atributo, valor in teste.atributos.items():
+#     print(atributo, ": ", valor)
 
-print("teste.tabela_origem: \n", teste.tabela_origem)
+#print("teste.tabela_origem: \n", teste.tabela_origem)
 
 teste.tabela_origem.to_csv("tabela_teste.csv")
+
+teste.adiciona_classe({"Bárbaro": 10})
+
+teste.adiciona_classe({"Arcanista": 9})
+
+print(teste.classes.keys())
+
+#aaah = teste.poderes_disponíveis()
+#print(aaah)
 
 # print(teste.perícias_das_classes())
 
 # print(teste.classes)
-
-# teste.adiciona_classe({"Arcanista": 9})
 
 # print(teste.perícias_das_classes())
 
@@ -364,7 +408,6 @@ teste.tabela_origem.to_csv("tabela_teste.csv")
 # print(teste_lista)
 # print(teste_lista[0])
 
-# teste.adiciona_classe({"Bárbaro": 10})
 # print(teste.classes)
 
 # print(teste.get_classe_principal())

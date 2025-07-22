@@ -1,9 +1,13 @@
-Ideia de estrutura de tabela generalizavel
-NOTAS: um poder podedar mais de um bônus, então cada poder poderia ter mais de uma linha na tabela.
-
+POSSIVEIS PROBLEMAS: Especialista em Escola (arcanista), Armadilheiro (caçador), Título (cavaleiro e nobre), Autoridade Eclesiática (clérigo), Mestre Celebrante (clérigo), Mestre em Arma (guerreiro), Alquimista Iniciado (inventor), Armeiro (inventor), Balística (inventor), Mestre Alquimista (inventor), Poder de Paladino (paladino), Disparo Preciso (geral, combate), Encouraçado (geral, combate), Estilo de Arma e Escudo (geral, combate), Foco em Arma (geral, combate), Ao Sabor do Destino (geral, destino), Foco em Perícia (geral, destino), Parceiro (geral, destino), Celebrar Ritual (geral, magia), Escrever Pergaminho (geral, magia), Foco em Magia (geral, magia), Magia Acelerada (geral, magia), Preparar Poção (geral, magia), Teurgista Místico (concedido, Wynna), Poderes de tormenta que necessitam tantos outro poderes de tormenta (tormenta)
 What?: Brado Assutador (bárbaro)
 
-POSSIVEIS PROBLEMAS: Especialista em Escola (arcanista), Armadilheiro (caçador), Título (cavaleiro e nobre), Autoridade Eclesiática (clérigo), Mestre Celebrante (clérigo), Mestre em Arma (guerreiro), Alquimista Iniciado (inventor), Armeiro (inventor), Balística (inventor), Mestre Alquimista (inventor), Poder de Paladino (paladino), Disparo Preciso (geral, combate), Encouraçado (geral, combate), Estilo de Arma e Escudo (geral, combate), Foco em Arma (geral, combate), Ao Sabor do Destino (geral, destino), Foco em Perícia (geral, destino), Parceiro (geral, destino), Celebrar Ritual (geral, magia), Escrever Pergaminho (geral, magia), Foco em Magia (geral, magia), Magia Acelerada (geral, magia), Preparar Poção (geral, magia), Teurgista Místico (concedido, Wynna), Poderes de tormenta que necessitam tantos outro poderes de tormenta (tormenta)
+Ideia de estrutura de tabela generalizavel
+
+A ideia é fazer uma tabela com tudo que altera os stats do arquivo de dicionário de stats.
+Isso inclui poderes, poderes de classe, poderes de classe que vem automáticamente, armas, equipamento, etc...
+Assim para criar um personagem pode-se apenas fazer um subset dessa tabela com o que é aplicável ao personagem e depois iterar sobre ela adicionando os stats.
+Cada poder pode ter mais de uma entrada na tabela, caso ele de mais de um bônus.
+Isso também ajuda quando algum poder começa a ter um efeito adicional a partir de certo nível.
 
 nome: Nome do bônus.
 
@@ -33,7 +37,7 @@ restrição_perícia: Perícia necessária ser treinado para ter esse bônus.
 
 restrição_magia: Magia necessária ser treinado para ter esse bônus.
 
-restrição_atributo:
+restrição_atributo: Valor de atributo mínimo para ter esse bônus.
 
 automatico: Se o bônus é automáticamente dado ao se conseguir os pré-requisitos ou deve ser selecionado.
 
