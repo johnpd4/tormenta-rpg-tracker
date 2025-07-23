@@ -17,6 +17,7 @@ categoria_tamanho - Categoria de tamanho
 margem_ameaça - Margem de Ameaça
 multiplicador - Multiplicador de Crítico
 
+bonus_pericia_treinada - Bônus de Treino para Perícias
 acrobacia - Pontos na Perícia de Acrobacia
 adestramento – Pontos na Perícia de Adestramento
 atletismo – Pontos na Perícia de Atletismo

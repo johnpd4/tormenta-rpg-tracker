@@ -1,0 +1,7 @@
+Para poder fazer as tabelas de csv facilmente ao invés de ter que fazê-las pelo python ou manualmente, eu estou usando o google sheets.
+No link a seguir pode-se ver as tabelas que estou fazendo e baixando para uso no programa.
+A interface dele é boa e ajuda ao fazer essas coisas.
+Para poder modificar as tabelas infelizmente é necessário fazer download delas individualmente e exportá-las ao seu própio google drive.
+Vá em Arquivo(File) > Baixar(Download) e escolha um formato.
+A opção de fazer uma cópia para o projeto todo existe, mas o google não deixa eu disponibilizar ela sem dar permissão de editor.
+https://docs.google.com/spreadsheets/d/12R4jOloF2QHfoSE6Ka9J6UYh-N_mNzIJen-kGJjqe_M/edit?gid=568804043#gid=568804043

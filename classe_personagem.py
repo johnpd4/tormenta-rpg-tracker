@@ -346,26 +346,40 @@ class personagem:
         # Iterar pelas linhas para testar as restrições
         for _, row in tabela_poderes.iterrows():
 
-            poder_restrito = True
             classe_do_poder = None
-            # TODO: shit still doesnt work, a maneira q os testes estão estruturados ainda é uma merda
-            if row["restrição_classe"] is not None:
-                for classe in self.classes.keys():
-                    if classe == row["restrição_classe"]:
-                        poder_restrito = False
-                        classe_do_poder = classe
 
+            # Primeiro ver se há alguma restrição de classe
+            if row["restrição_classe"] is not None:
+                # Se têm testar se a classe a qual o poder é restrito não está nas
+                # classes do personagem, se ele não estiver, podemos parar de
+                # processar esse poder aqui
+                if not any(x in row["restrição_classe"] for x in self.classes.keys()):                
+                    print("Poder ", row["nome"], " não válido pois a restrição de classe ", row["restrição_classe"], " não foi cumprida")
+                    continue
+                # Se teve um match da classe a qual o poder é restrito e as classes
+                # do personagem, queremos saber que classe é, pois quando há uma
+                # restrição de nível em conjunto com uma de classe, a restrição
+                # é interpretada como "seja um inventor de nível 9" ao invés de
+                # "seja um inventor e tenha alguma classe nível 9"
+                else:
+                    for classe in self.classes.keys():
+                        if classe == row["restrição_classe"]:
+                            classe_do_poder = classe
+
+            # Se há restrição de nível
             if row["restrição_nível"] is not None:
+                # Testar a classe que a qual o poder pertence, se ela existir
                 if classe_do_poder is not None:
                     if self.get_nível_de_classe(classe_do_poder) < row["restrição_nível"]:
-                        poder_restrito = False
+                        print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " da classe do poder não cumprida")
+                        continue
+                # Se não tiver classe a qual o poder pertence, testar todos os níveis de classe
                 else:
-                    for nível in self.classes.values():
-                        if nível < row["restrição_nível"]:
-                            poder_restrito = False
-            
-            if not poder_restrito:
-                self.tabela_origem.loc[self.tabela_origem.last_valid_index() + 1] = row
+                    if not any(x >= row["restrição_nível"] for x in self.classes.values()):
+                        print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " não cumprida")
+                        continue
+
+            self.tabela_origem.loc[self.tabela_origem.last_valid_index() + 1] = row
 
 
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
@@ -382,11 +396,9 @@ teste.adiciona_atributos_raça(pontos_livres = None)
 
 #print("teste.tabela_origem: \n", teste.tabela_origem)
 
-teste.tabela_origem.to_csv("tabela_teste.csv")
-
 teste.adiciona_classe({"Bárbaro": 10})
 
-teste.adiciona_classe({"Lutador": 9})
+teste.adiciona_classe({"Arcanista": 9})
 
 teste.poderes_disponíveis()
 
