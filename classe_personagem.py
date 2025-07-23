@@ -200,7 +200,7 @@ class personagem:
                         "restrição_atributo": [restrição_atributo],
                         "automático": [automático],
                         "referência": [referência]}
-        
+
         tabela_origem = pd.DataFrame.from_dict(data = dict_para_df)
         self.tabela_origem = pd.concat([self.tabela_origem, tabela_origem], ignore_index = True)
         
@@ -341,30 +341,31 @@ class personagem:
         disponíveis para o personagem atual
         """
         tabela_poderes = pd.read_csv("./tabelas/info_poderes.csv")
+        tabela_poderes = tabela_poderes.replace({float("nan"): None})
         
         # Iterar pelas linhas para testar as restrições
         for _, row in tabela_poderes.iterrows():
 
-            # Assuma que o poder não é restrito
-            poder_restrito = False
+            poder_restrito = True
+            classe_do_poder = None
+            # TODO: shit still doesnt work, a maneira q os testes estão estruturados ainda é uma merda
+            if row["restrição_classe"] is not None:
+                for classe in self.classes.keys():
+                    if classe == row["restrição_classe"]:
+                        poder_restrito = False
+                        classe_do_poder = classe
 
-            # TODO: this code sucks and doesnt work :)
-            # tem q re-pensar como fazer os checks de restrição, principalmente
-            # quando se fala de níveis e classes
-            # Testar a restrição de classe
-            for classe in self.classes.keys():
-                if classe not in row["restrição_classe"]:
-                    poder_restrito = True
-
-            # Testar a restrição de nível
-            for nível in self.classes.values():
-                if nível < row["restrição_nível"]:
-                    print("".join(["Poder ", row["nome"], " restrito por nível muito baixo!\n Necessário: ",
-                        row["restrição_nível"], "Encontrado: ", nível]))
-                    poder_restrito = True
+            if row["restrição_nível"] is not None:
+                if classe_do_poder is not None:
+                    if self.get_nível_de_classe(classe_do_poder) < row["restrição_nível"]:
+                        poder_restrito = False
+                else:
+                    for nível in self.classes.values():
+                        if nível < row["restrição_nível"]:
+                            poder_restrito = False
             
             if not poder_restrito:
-                self.tabela_origem = pd.concat([self.tabela_origem, row], ignore_index = True)
+                self.tabela_origem.loc[self.tabela_origem.last_valid_index() + 1] = row
 
 
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
@@ -385,9 +386,13 @@ teste.tabela_origem.to_csv("tabela_teste.csv")
 
 teste.adiciona_classe({"Bárbaro": 10})
 
-teste.adiciona_classe({"Arcanista": 9})
+teste.adiciona_classe({"Lutador": 9})
 
-print(teste.classes.keys())
+teste.poderes_disponíveis()
+
+teste.tabela_origem.to_csv("tabela_teste.csv")
+
+#print(teste.classes.keys())
 
 #aaah = teste.poderes_disponíveis()
 #print(aaah)

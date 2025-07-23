@@ -8,3 +8,4 @@
 6,Des da raça Elfo,Raça Elfo,1,Sim,"Tormenta 20: Jogo do Ano, página 22",des,1,,,,Elfo,,,,,,
 7,Con da raça Elfo,Raça Elfo,1,Sim,"Tormenta 20: Jogo do Ano, página 22",con,-1,,,,Elfo,,,,,,
 8,Int da raça Elfo,Raça Elfo,1,Sim,"Tormenta 20: Jogo do Ano, página 22",int,2,,,,Elfo,,,,,,
+-1,Casca Grossa,Poder de Lutador,0,,"Tormenta 20: Jogo do Ano, página 76",defesa,"max(0, math.floor((nível:""Lutador"" - 3) / 4))",,Não usar armadura pesada,Lutador,,7,,,,,
