@@ -1,0 +1,35 @@
+Ordem de Carregar as Coisas do Personagem
+1. Nome do Personagem & Jogador
+
+2. Classes e seus Respectivos Níveis
+2. Rolages / Pontos
+2. Poderes de Aumento de Atributo
+2. Itens de Aumento de Atributo
+	- Cinto do Campeão (+1 for)
+	- Manoplas da Força do Ogro (+1 for)
+	- Luvas da Delicadeza (+1 des)
+	- Torque do Vigor (+1 con)
+	- Brincos da Sagacidade (+1 int)
+	- Pingente da Sensatez (+1 sab)
+	- Manto do Fascínio (+1 car)
+	- Cinto da Força do Gigante (+2 for)
+	- Pulseiras da Celeridade (+2 des)
+	- Amuleto da Robustez (+2 con)
+	- Tiara da Sapiência (+2 int)
+	- Estola da Serenidade (+2 sab)
+	- Coroa Majestosa (+2 car)
+2. Livros de Aumento de Atributo
+	- Manual do Bom Exercício (+1 for)
+	- Manual dos Movimentos Precisos (+1 des)
+	- Manual da Saúde Corporal (+1 con)
+	- Tomo dos Grandes Pensamentos (+1 int)
+	- Tomo da Compreensão (+1 sab)
+	- Tomo da Liderança e Influência (+1 car)
+2. Raça
+2. Divindade
+
+3. Atributos da Raça
+
+4. Perícias
+
+5.

@@ -18,6 +18,7 @@ class personagem:
         self.raça = None
         self.classes = dict()
         self.atributos = {"for": None, "des": None, "con": None, "int": None, "sab": None, "car": None}
+        self.tabela_perícias = None
         self.tabela_origem = self.inicializa_tabela_de_origem()
 
     def print_aviso(self, aviso):
@@ -57,9 +58,11 @@ class personagem:
         """
         tabela_divindades = pd.read_csv("./tabelas/info_divindades.csv")
         divindades_válidas = tabela_divindades["divindade"].tolist()
+
+        #print("divindades_válidas: ", divindades_válidas)
         
         # Testar se a divindade é válida
-        if divindades_válidas not in divindades_válidas:
+        if divindade not in divindades_válidas:
             raise Exception("Divindade inválida!")
         
         self.divindade = divindade
@@ -133,7 +136,7 @@ class personagem:
         classe = self.get_classe_principal()
 
         tabela_classes = pd.read_csv("./tabelas/info_classes.csv")        
-        tabela_pericias = pd.read_csv("./tabelas/info_pericias.csv")
+        tabela_perícias = pd.read_csv("./tabelas/info_perícias.csv")
 
         pericias_obg = tabela_classes.loc[tabela_classes["classe"] == classe]["pericias_obg_str"][0].split("|")
         pericias_alt = tabela_classes.loc[tabela_classes["classe"] == classe]["pericias_alt_str"][0].split("|")
@@ -141,9 +144,9 @@ class personagem:
 
         vetor_auxiliar = []
 
-        for _, linha in tabela_pericias.iterrows():
+        for _, linha in tabela_perícias.iterrows():
             if linha["pericia"] == "Nenhuma":
-                vetor_auxiliar.append("-")
+                vetor_auxiliar.append(None)
                 continue
             if linha["pericia"] in pericias_obg:
                 vetor_auxiliar.append("Obrigatória")
@@ -152,12 +155,12 @@ class personagem:
             elif linha["pericia"] in pericias_op:
                 vetor_auxiliar.append("Opcional")
             else:
-                vetor_auxiliar.append("-")
+                vetor_auxiliar.append(None)
 
-        tabela_pericias["pericias_do_jogador"] = vetor_auxiliar
+        tabela_perícias["pericias_do_jogador"] = vetor_auxiliar
 
-        return(tabela_pericias)
-
+        self.tabela_perícias = tabela_perícias
+        
     def inicializa_tabela_de_origem(self):
         return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "bônus_em", "valor_bônus",
                                         "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
@@ -202,6 +205,7 @@ class personagem:
                         "referência": [referência]}
 
         tabela_origem = pd.DataFrame.from_dict(data = dict_para_df)
+        #print("tabela_origem: ", self.tabela_origem.columns)
         self.tabela_origem = pd.concat([self.tabela_origem, tabela_origem], ignore_index = True)
         
     def calcula_atributos_iniciais(self, método: str, valores: dict):
@@ -289,15 +293,15 @@ class personagem:
         # Pegar os atributos de raça
         tabela_raças = pd.read_csv("./tabelas/info_raças.csv")
         atributos_raça = tabela_raças[tabela_raças["raça"] == self.raça]
-        print(atributos_raça)
+        #print(atributos_raça)
 
         quantidade_pontos_livres = atributos_raça["pontos_livres"].tolist().pop()
         permite_mais_2 = atributos_raça["permite_mais_2"].tolist().pop()
         restrição_pontos_livres = atributos_raça["restrição_pontos_livres"].tolist().pop()
         referência = atributos_raça["referência"].tolist().pop()
 
-        print("atributos_raça['for']: ", atributos_raça["for"])
-        print("atributos_raça['for'].tolist().pop(): ", atributos_raça["for"].tolist().pop())
+        #print("atributos_raça['for']: ", atributos_raça["for"])
+        #print("atributos_raça['for'].tolist().pop(): ", atributos_raça["for"].tolist().pop())
 
         atributos_raça = {"for": atributos_raça["for"].tolist().pop(), "des": atributos_raça["des"].tolist().pop(),
                           "con": atributos_raça["con"].tolist().pop(), "int": atributos_raça["int"].tolist().pop(),
@@ -335,6 +339,24 @@ class personagem:
                                                     automático = "Sim",
                                                     referência = referência)
 
+    def aumentos_de_atributos_disponíveis(self):
+        tabela_aumento_atributo = pd.read_csv("info_poderes_atributos.csv")
+        tabela_aumento_atributo = tabela_aumento_atributo.sort_values(by = "prioridade", ascending = False)
+
+        tabela_aumentos_válidos = self.inicializa_tabela_de_origem()
+
+        for _, row in tabela_aumento_atributo.iterrows():
+            # Se há restrição de nível
+            if row["restrição_nível"] is not None:
+                if not any(x >= row["restrição_nível"] for x in self.classes.values()):
+                    print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " não cumprida")
+                    continue
+            
+            # Apenas testamos restrições de níveis porque esses poderes apenas dependem de sí mesmos
+            tabela_aumentos_válidos.loc[self.tabela_origem.last_valid_index() + 1] = row
+
+        return(tabela_aumentos_válidos)
+
     def poderes_disponíveis(self):
         """
         Pegar a giga-gigante tabela de todos os poderes e fazer um subset daqueles que estão
@@ -342,7 +364,11 @@ class personagem:
         """
         tabela_poderes = pd.read_csv("./tabelas/info_poderes.csv")
         tabela_poderes = tabela_poderes.replace({float("nan"): None})
-        
+        # Ordena a tabela pela prioridade necessário para ver a restrição dos poderes
+        tabela_poderes = tabela_poderes.sort_values (by = "prioridade", axis = 0, ascending = False)
+
+        tabela_poderes_válidos = self.inicializa_tabela_de_origem()
+
         # Iterar pelas linhas para testar as restrições
         for _, row in tabela_poderes.iterrows():
 
@@ -379,58 +405,36 @@ class personagem:
                         print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " não cumprida")
                         continue
 
-            self.tabela_origem.loc[self.tabela_origem.last_valid_index() + 1] = row
+            if row["restrição_divindade"] is not None:
+                if self.divindade not in row["restrição_divindade"]:
+                    print("Poder ", row["nome"], " não válido pois a restrição de divindade ", row["restrição_divindade"], " não cumprida")
+                    continue
 
+            #print("tabela_poderes_válidos: ", tabela_poderes_válidos)
+            #print("row: ", row)
 
+            aux_row = pd.DataFrame.from_dict([row.to_dict()])
+            #print("aux_row: ", aux_row)
+
+            tabela_poderes_válidos = pd.concat([tabela_poderes_válidos, aux_row], ignore_index = True)
+            #tabela_poderes_válidos.loc[tabela_poderes_válidos.last_valid_index() + 1] = row
+
+        return(tabela_poderes_válidos)
+
+# Passo 1:
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
+
+# Passo 2:
+teste.adiciona_classe({"Lutador": 11})
 
 teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "des": 17, "int": 13, "con": 13, "sab": 8, "car": 18})
 
-teste.adiciona_raça("Elfo")
-#teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "int": 0, "con": 1, "sab": 0, "car": 0})
-teste.adiciona_atributos_raça(pontos_livres = None)
-#print(teste.atributos)
+teste.adiciona_raça("Humano")
 
-# for atributo, valor in teste.atributos.items():
-#     print(atributo, ": ", valor)
+teste.adiciona_divindade("Valkaria")
 
-#print("teste.tabela_origem: \n", teste.tabela_origem)
+teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "con": 1, "int": 0, "sab": 0, "car": 0})
 
-teste.adiciona_classe({"Bárbaro": 10})
-
-teste.adiciona_classe({"Arcanista": 9})
-
-teste.poderes_disponíveis()
+print(teste.poderes_disponíveis())
 
 teste.tabela_origem.to_csv("tabela_teste.csv")
-
-#print(teste.classes.keys())
-
-#aaah = teste.poderes_disponíveis()
-#print(aaah)
-
-# print(teste.perícias_das_classes())
-
-# print(teste.classes)
-
-# print(teste.perícias_das_classes())
-
-# print(teste.classes)
-
-# teste.adiciona_classe({"Arcanista": 1})
-
-# print(teste.classes)
-
-# teste_lista = list(teste.classes)
-# print(teste_lista)
-# print(teste_lista[0])
-
-# print(teste.classes)
-
-# print(teste.get_classe_principal())
-
-# teste_pv = teste.calcula_pv_das_classes()
-# print(teste_pv)
-
-# teste_pm = teste.calcula_pm_das_classes()
-# print(teste_pm)
