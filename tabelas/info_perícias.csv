@@ -1,4 +1,4 @@
-pericia,atributo,somente_treinada,penalidade_de_armadura
+perícia,atributo,somente_treinada,penalidade_de_armadura
 Acrobacia,des,Não,Sim
 Adestramento,car,Sim,Não
 Atletismo,for,Não,Não
@@ -28,4 +28,3 @@ Reflexos,des,Não,Não
 Religião,sab,Sim,Não
 Sobrevivência,sab,Não,Não
 Vontade,sab,Não,Não
-Nenhuma,,Não,Não

@@ -21,18 +21,29 @@ class personagem:
         self.tabela_perícias = None
         self.tabela_origem = self.inicializa_tabela_de_origem()
 
-    def print_aviso(self, aviso):
+    def print_aviso(self, aviso: str):
+        """
+        Printa um aviso colorido para quando o usuário fizer algo sub-optimal
+        aviso: str pra printar
+        """
         print("\033[91m" + aviso + "\033[0m")
 
     def get_classe_principal(self):
+        """
+        Pega a classe principal de um personagem, isso é, a primeira classe
+        """
         classe = list(self.classes.items())[0][0]
         if classe == None:
             raise Exception("Tentativa de acessar classe principal encontrou None")
         return(classe)
 
-    def get_nível_de_classe(self, classe_match):
-        for classe, nível in self.classes.items():
-            if classe == classe_match:
+    def get_nível_de_classe(self, classe: str):
+        """
+        Pega o nível de uma classe do personagem
+        classe: str classe da qual o nível deve ser pego
+        """
+        for classe_dict, nível in self.classes.items():
+            if classe_dict == classe:
                 return(nível)
         return(None)
     
@@ -138,36 +149,165 @@ class personagem:
         tabela_classes = pd.read_csv("./tabelas/info_classes.csv")        
         tabela_perícias = pd.read_csv("./tabelas/info_perícias.csv")
 
-        pericias_obg = tabela_classes.loc[tabela_classes["classe"] == classe]["pericias_obg_str"][0].split("|")
-        pericias_alt = tabela_classes.loc[tabela_classes["classe"] == classe]["pericias_alt_str"][0].split("|")
-        pericias_op = tabela_classes.loc[tabela_classes["classe"] == classe]["pericias_op_str"][0].split("|")
+        tabela_classes = tabela_classes.replace({float("nan"): None})
+        tabela_perícias = tabela_perícias.replace({float("nan"): None})
+
+        teste = tabela_classes.loc[tabela_classes["classe"] == classe]
+        #print(teste["perícias_obg_str"])
+        #print("Fortitude" in teste["perícias_obg_str"].to_string)
+
+        linha = tabela_classes.loc[tabela_classes["classe"] == classe]
+
+        perícias_obg = linha["perícias_obg_str"].values[0]
+        perícias_alt = linha["perícias_alt_str"].values[0]
+        perícias_op = linha["perícias_op_str"].values[0]
+
+        # print("perícias_obg: ", perícias_obg)
+        # print("perícias_alt: ", perícias_alt)
+        # print("perícias_op: ", perícias_op)
 
         vetor_auxiliar = []
 
         for _, linha in tabela_perícias.iterrows():
-            if linha["pericia"] == "Nenhuma":
+            # print("perícia: ", linha["perícia"])
+            # print("linha[perícia] in perícias_obg: ", linha["perícia"] in perícias_obg)
+            # print("linha[perícia] in perícias_alt: ", linha["perícia"] in perícias_alt)
+            # print("linha[perícia] in perícias_op: ", linha["perícia"] in perícias_op)
+            status_perícia = str()
+
+            if linha["perícia"] in perícias_obg:
+                #print("perícia ", linha["perícia"], " é obrigatória")
+                status_perícia = "".join([status_perícia, "Obrigatória"])
+                vetor_auxiliar.append(status_perícia)
+                continue
+            if perícias_alt is not None:
+                if linha["perícia"] in perícias_alt:
+                    #print("perícia ", linha["perícia"], " é alternativa")
+                    status_perícia = "".join([status_perícia, "Alternativa"])
+            if linha["perícia"] in perícias_op:
+                #print("perícia ", linha["perícia"], " é opcional")
+                if status_perícia == "":
+                    status_perícia = "".join([status_perícia, "Opcional"])
+                else:
+                    status_perícia = "".join([status_perícia, "|Opcional"])
+
+            if status_perícia == "":
                 vetor_auxiliar.append(None)
                 continue
-            if linha["pericia"] in pericias_obg:
-                vetor_auxiliar.append("Obrigatória")
-            elif linha["pericia"] in pericias_alt:
-                vetor_auxiliar.append("Alternativa")
-            elif linha["pericia"] in pericias_op:
-                vetor_auxiliar.append("Opcional")
+            
+            vetor_auxiliar.append(status_perícia)
+
+        tabela_perícias["perícias_do_jogador"] = vetor_auxiliar
+        tabela_perícias = tabela_perícias.sort_values("perícias_do_jogador")
+
+        return(tabela_perícias)
+
+    def get_atributo(self, atributo: str):
+        # TODO: Atualizar isso para os futuros todos atributos.
+        # Não sei ainda se vou colocar tudo do dicionario_stats.txt no dict de atributos
+        # ou separar de alguma maneira. Por enquanto fica essa função embrionária.
+
+        return(self.atributos.get(atributo))
+
+    def get_nível_total(self):
+        """
+        Retorna o nível total do personagem, incluíndo todas as classes
+        """
+        return(sum(self.classes.values()))
+
+    def selecionar_perícias(self, perícias_alt_selecionadas: str, perícias_op_selecionadas: list, perícias_livres_selecionadas: list):
+
+        tabela_perícias_jogador = self.perícias_das_classes()
+        print(tabela_perícias_jogador)
+        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")
+        tabela_classes = tabela_classes[tabela_classes["classe"] == self.get_classe_principal()]
+
+        # O número e perícias opcionais é dado pela classe
+        num_perícias_opcionais = tabela_classes["número_perícias_op"].values
+
+        # Perícias livres vêm do seu stat de int, a diferença delas pras
+        # opcionais é que pode ser literalmente qualquer perícia
+        num_perícias_livres = self.get_atributo("int")
+
+        if len(perícias_op_selecionadas) > num_perícias_opcionais:
+            raise Exception("Foram selecionadas mais perícias opcionais do que a classe permite!\n Você esqueceu de transferir algumas para perícias livres?")
+        elif len(perícias_op_selecionadas) < num_perícias_opcionais:
+            self.print_aviso("Número de perícias opcionais selecionadas foi menor do que o permitido.")
+
+        if len(perícias_livres_selecionadas) > num_perícias_livres:
+            raise Exception("Foram selecionadas mais perícias livres do que a inteligência do personagem, ", self.get_atributo("int"), " permite!")
+        elif len(perícias_livres_selecionadas) < num_perícias_livres:
+            self.print_aviso("Número de perícias livres selecionadas foi menor do que o permitido.")
+
+        # Ordem pra processar:
+        # 1. Perícias Obrigatórias
+        # 2. Perícias Alternativas
+        # 3. Perícias Opcionais
+        # 4. Perícias Livres
+
+        # O bônus escala de maneira mto bizarra, ent fiz isso
+        # fuck you level 14
+        if self.get_nível_total != 14:
+            bônus_de_treino = 2 * (1 + max(0, math.floor((self.get_nível_total()) / 7)))
+        else:
+            bônus_de_treino = 4
+        perícias_treinadas = []
+        bônus_atributo = []
+        bônus_treino = []
+        bônus_nível = [math.floor(self.get_nível_total() / 2)] * 29
+
+        for _, row in tabela_perícias_jogador.iterrows():
+            #print(row["perícia"])
+            #print(row["perícias_do_jogador"])
+            bônus_atributo.append(self.get_atributo(row["atributo"]))
+            if row["perícias_do_jogador"] is not None:
+                if row["perícias_do_jogador"] == "Obrigatória":
+                    #print("Detectou Obrigatória!\n===========")
+                    perícias_treinadas.append("Treinado (obg)")
+                    bônus_treino.append(bônus_de_treino)
+                    continue
+                elif "Alternativa" in row["perícias_do_jogador"] and row["perícia"] in perícias_alt_selecionadas:
+                    #print("Detectou Alternativa Escolhida!\n===========")
+                    perícias_treinadas.append("Treinado (alt)")
+                    bônus_treino.append(bônus_de_treino)
+                    continue
+                elif "Alternativa" in row["perícias_do_jogador"]:
+                    #print("Detectou Alternativa não Escolhida!")
+                    pass
+                elif "Opcional" in row["perícias_do_jogador"] and row["perícia"] in perícias_op_selecionadas:
+                    #print("Detectou Opcional Escolhida!\n===========")
+                    perícias_treinadas.append("Treinado (op)")
+                    bônus_treino.append(bônus_de_treino)
+                    continue
+                elif "Opcional" in row["perícias_do_jogador"]:
+                    #print("Detectou Opcional não Escolhida!")
+                    pass
+            if row["perícia"] in perícias_livres_selecionadas:
+                #print("Detectou Livre Escolhida!\n===========")
+                perícias_treinadas.append("Treinado (livre)")
+                bônus_treino.append(bônus_de_treino)
+                continue
             else:
-                vetor_auxiliar.append(None)
-
-        tabela_perícias["pericias_do_jogador"] = vetor_auxiliar
-
-        self.tabela_perícias = tabela_perícias
+                #print("Detectou Livre não Escolhida\n===========")
+                perícias_treinadas.append("Não Treinada")
+                bônus_treino.append(0)
+            #print("===========")
         
+        tabela_perícias_jogador["treino"] = perícias_treinadas
+        tabela_perícias_jogador["bônus_nível"] = bônus_nível
+        tabela_perícias_jogador["bônus_atributo"] = bônus_atributo
+        tabela_perícias_jogador["bônus_treino"] = bônus_treino
+
+        tabela_perícias_jogador["bônus_total"] = [nível + atr + treino for nível, atr, treino in zip(bônus_nível, bônus_atributo, bônus_treino)]
+
+        self.tabela_perícias = tabela_perícias_jogador
+
     def inicializa_tabela_de_origem(self):
         return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "bônus_em", "valor_bônus",
                                         "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
                                         "restrição_poderes", "restrição_divindade", "restrição_perícia", "restrição_magia",
                                         "restrição_atributo"]))
 
-    # TODO: Lembrar de atualizar essa porra horrível
     def adiciona_linha_tabela_de_origem(self,
                                         nome,
                                         origem,
@@ -356,7 +496,7 @@ class personagem:
             tabela_aumentos_válidos.loc[self.tabela_origem.last_valid_index() + 1] = row
 
         return(tabela_aumentos_válidos)
-
+    
     def poderes_disponíveis(self):
         """
         Pegar a giga-gigante tabela de todos os poderes e fazer um subset daqueles que estão
@@ -425,16 +565,26 @@ class personagem:
 teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
 
 # Passo 2:
-teste.adiciona_classe({"Lutador": 11})
+teste.adiciona_classe({"Nobre": 11})
 
-teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "des": 17, "int": 13, "con": 13, "sab": 8, "car": 18})
+teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "des": 17, "int": 15, "con": 13, "sab": 8, "car": 18})
 
 teste.adiciona_raça("Humano")
 
 teste.adiciona_divindade("Valkaria")
 
-teste.adiciona_atributos_raça(pontos_livres = {"for": 1, "des": 1, "con": 1, "int": 0, "sab": 0, "car": 0})
+teste.adiciona_atributos_raça(pontos_livres = {"for": 0, "des": 1, "con": 1, "int": 1, "sab": 0, "car": 0})
 
-print(teste.poderes_disponíveis())
+print("int: ", teste.get_atributo("int"))
+
+teste.selecionar_perícias(perícias_alt_selecionadas = "Diplomacia",
+                          perícias_livres_selecionadas = ["Ladinagem", "Luta", "Fortitude"],
+                          perícias_op_selecionadas = ["Cavalgar", "Guerra", "Pontaria", "Jogatina"])
+
+print(teste.tabela_perícias)
+
+#print(teste.tabela_perícias)
+
+teste.poderes_disponíveis()
 
 teste.tabela_origem.to_csv("tabela_teste.csv")
