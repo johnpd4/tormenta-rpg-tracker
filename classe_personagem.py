@@ -3,6 +3,7 @@ import os
 import math
 from typing import Union
 from pathlib import Path
+import re
 
 os.chdir(Path(__file__).resolve().parent)
 
@@ -17,9 +18,26 @@ class personagem:
         self.divindade = None
         self.raça = None
         self.classes = dict()
-        self.atributos = {"for": None, "des": None, "con": None, "int": None, "sab": None, "car": None}
+        self.atributos = {"for": 0, "des": 0, "con": 0, "int": 0, "sab": 0, "car": 0}
         self.tabela_perícias = None
         self.tabela_origem = self.inicializa_tabela_de_origem()
+        self.num_poderes_disponíveis = None
+
+    def adiciona_atributo(self, atributo: str, valor: int):
+        #print("atributo: ", atributo)
+        #print("self.tabela_perícias.columns: ", self.tabela_perícias["perícia"].values)
+        if atributo in self.atributos.keys():
+            valor_novo = self.atributos.get(atributo) + valor
+            self.atributos.update({atributo: valor_novo})
+            return
+        if self.tabela_perícias is not None:
+            if atributo in self.tabela_perícias["perícia"].values:
+                tabela_perícias = self.tabela_perícias
+                row = tabela_perícias[tabela_perícias["perícia"] == atributo]
+                valor_novo = row["bônus_outro"].values + valor
+                tabela_perícias.loc[tabela_perícias["perícia"] == atributo, "bônus_outro"] = valor_novo
+                self.tabela_perícias = tabela_perícias
+                return
 
     def print_aviso(self, aviso: str):
         """
@@ -37,6 +55,22 @@ class personagem:
             raise Exception("Tentativa de acessar classe principal encontrou None")
         return(classe)
 
+    def get_tabela(self, tabela):
+        if tabela == "classes":
+            return(pd.read_csv("./tabelas/info_classes.csv"))
+        if tabela == "divindades":
+            return(pd.read_csv("./tabelas/info_divindades.csv"))
+        if tabela == "perícias":
+            return(pd.read_csv("./tabelas/info_perícias.csv"))
+        if tabela == "poderes":
+            return(pd.read_csv("./tabelas/info_poderes.csv"))
+        if tabela == "poderes_atributos":
+            return(pd.read_csv("./tabelas/info_poderes_atributos.csv"))
+        if tabela == "raças":
+            return(pd.read_csv("./tabelas/info_raças.csv"))
+        else:
+            return(None)
+
     def get_nível_de_classe(self, classe: str):
         """
         Pega o nível de uma classe do personagem
@@ -53,7 +87,7 @@ class personagem:
         raça: str com a raça
         """
         # Importar a lista de raças válidas
-        tabela_raças = pd.read_csv("./tabelas/info_raças.csv")
+        tabela_raças = self.get_tabela("raças")
         raças_válidas = tabela_raças["raça"].tolist()
         
         # Testar se a raça é válida
@@ -67,7 +101,7 @@ class personagem:
         Adiciona ou atualiza a divindade
         divindade: str com o nome da divindade
         """
-        tabela_divindades = pd.read_csv("./tabelas/info_divindades.csv")
+        tabela_divindades = self.get_tabela("divindades")
         divindades_válidas = tabela_divindades["divindade"].tolist()
 
         #print("divindades_válidas: ", divindades_válidas)
@@ -84,7 +118,7 @@ class personagem:
         classe: dict que contém classe e nível
         """
         # Importar a lista de classes válidas
-        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")
+        tabela_classes = self.get_tabela("classes")
         classes_válidas = tabela_classes["classe"].tolist()
 
         # Testar se a classe e o nível dados são validos pra por na classe
@@ -104,13 +138,15 @@ class personagem:
             if contador_níveis > 20:
                 raise Exception("Níveis total de todas as classes não podem ser maiores que 20!")
 
+        self.num_poderes_disponíveis = self.get_num_poderes()
+
     def calcula_pv_das_classes(self):
         """
         Calcula a quantidade de pv's de um jogador.
         Só leva em consideração a classe do jogador.
         """
         # Chamar a tabela de info e transformar em dicts
-        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")
+        tabela_classes = self.get_tabela("classes")
         pv_base = dict(zip(tabela_classes["classe"], tabela_classes["pv_base"]))
         pv_por_nível = dict(zip(tabela_classes["classe"], tabela_classes["pv_por_nível"]))
 
@@ -130,7 +166,7 @@ class personagem:
         Só leva em consideração a classe do jogador.
         """
         # Chamar a tabela de info e transformar em dicts
-        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")
+        tabela_classes = self.get_tabela("classes")
         pm_por_nível = dict(zip(tabela_classes["classe"], tabela_classes["pm_por_nível"]))
 
         pm = 0
@@ -146,8 +182,8 @@ class personagem:
         """
         classe = self.get_classe_principal()
 
-        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")        
-        tabela_perícias = pd.read_csv("./tabelas/info_perícias.csv")
+        tabela_classes = self.get_tabela("classes")
+        tabela_perícias = self.get_tabela("perícias")
 
         tabela_classes = tabela_classes.replace({float("nan"): None})
         tabela_perícias = tabela_perícias.replace({float("nan"): None})
@@ -197,8 +233,8 @@ class personagem:
             
             vetor_auxiliar.append(status_perícia)
 
-        tabela_perícias["perícias_do_jogador"] = vetor_auxiliar
-        tabela_perícias = tabela_perícias.sort_values("perícias_do_jogador")
+        tabela_perícias["perícias_da_classe"] = vetor_auxiliar
+        tabela_perícias = tabela_perícias.sort_values("perícias_da_classe")
 
         return(tabela_perícias)
 
@@ -215,12 +251,39 @@ class personagem:
         """
         return(sum(self.classes.values()))
 
-    def selecionar_perícias(self, perícias_alt_selecionadas: str, perícias_op_selecionadas: list, perícias_livres_selecionadas: list):
+    def get_num_poderes(self):
+        """
+        Retorna o número de poderes que um personagem pode escolher.
+        Todas as classes ganham um poder todo o nível com exceção do nível 1.
+        """
+        num_poderes = 0
+        for _, nível in self.classes.items():
+            num_poderes += nível - 1
+        return(num_poderes)
 
+    def get_poderes_do_personagem(self):
+        return(self.tabela_origem["nome"].unique())
+
+    def selecionar_perícias(self, perícias_op_selecionadas: list, perícias_livres_selecionadas: list, perícias_alt_selecionadas: Union[str, None] = None):
+        """
+        perícias_alt_selecionadas: a perícia alternativa selecionada. Apenas uma perícia alternativa pode ser selecionada,
+        pois sempre se escolhe uma de duas
+        perícias_op_selecionadas: uma lista de perícias para serem selecionadas como opcionais, tamanho limitado pelo número dado
+        pela classe principal do personagem
+        perícias_livres_selecionadas: uma lista de perícias para serem selecionadas como livres, tamanho limitado pela inteligênica
+        do personagem
+        Faz todos os cálculos e computações necessárias para as perícias, e atualiza a tabela de perícias do personagem
+        """
         tabela_perícias_jogador = self.perícias_das_classes()
-        print(tabela_perícias_jogador)
-        tabela_classes = pd.read_csv("./tabelas/info_classes.csv")
+        #print(tabela_perícias_jogador)
+        tabela_classes = self.get_tabela("classes")
         tabela_classes = tabela_classes[tabela_classes["classe"] == self.get_classe_principal()]
+        tabela_classes = tabela_classes.replace({float("nan"): None})
+
+        #print("tabela_classes[perícias_alt_str]: ", tabela_classes["perícias_alt_str"].values[0])
+
+        if tabela_classes["perícias_alt_str"].values[0] is None and perícias_alt_selecionadas is not None:
+            raise Exception("Essa classe não suporta perícias alternativas!")
 
         # O número e perícias opcionais é dado pela classe
         num_perícias_opcionais = tabela_classes["número_perícias_op"].values
@@ -228,16 +291,25 @@ class personagem:
         # Perícias livres vêm do seu stat de int, a diferença delas pras
         # opcionais é que pode ser literalmente qualquer perícia
         num_perícias_livres = self.get_atributo("int")
+        if num_perícias_livres < 0:
+            num_perícias_livres = 0
 
         if len(perícias_op_selecionadas) > num_perícias_opcionais:
             raise Exception("Foram selecionadas mais perícias opcionais do que a classe permite!\n Você esqueceu de transferir algumas para perícias livres?")
+        elif len(perícias_op_selecionadas) == 0:
+            self.print_aviso("Nenhuma perícia opcional selecionada.")
         elif len(perícias_op_selecionadas) < num_perícias_opcionais:
             self.print_aviso("Número de perícias opcionais selecionadas foi menor do que o permitido.")
 
         if len(perícias_livres_selecionadas) > num_perícias_livres:
             raise Exception("Foram selecionadas mais perícias livres do que a inteligência do personagem, ", self.get_atributo("int"), " permite!")
+        elif len(perícias_livres_selecionadas) == 0:
+            self.print_aviso("Nenhuma perícia livre selecionada.")
         elif len(perícias_livres_selecionadas) < num_perícias_livres:
             self.print_aviso("Número de perícias livres selecionadas foi menor do que o permitido.")
+
+        if any(x in perícias_op_selecionadas for x in perícias_livres_selecionadas):
+            self.print_aviso("Têm intersecção entre a lista de perícias opcionais e livres, considere perícias livres diferentes.")
 
         # Ordem pra processar:
         # 1. Perícias Obrigatórias
@@ -254,34 +326,36 @@ class personagem:
         perícias_treinadas = []
         bônus_atributo = []
         bônus_treino = []
-        bônus_nível = [math.floor(self.get_nível_total() / 2)] * 29
+        bônus_nível = [math.floor(self.get_nível_total() / 2)] * len(tabela_perícias_jogador.index)
 
         for _, row in tabela_perícias_jogador.iterrows():
             #print(row["perícia"])
-            #print(row["perícias_do_jogador"])
+            #print(row["perícias_da_classe"])
             bônus_atributo.append(self.get_atributo(row["atributo"]))
-            if row["perícias_do_jogador"] is not None:
-                if row["perícias_do_jogador"] == "Obrigatória":
+            if row["perícias_da_classe"] is not None:
+                if row["perícias_da_classe"] == "Obrigatória":
                     #print("Detectou Obrigatória!\n===========")
                     perícias_treinadas.append("Treinado (obg)")
                     bônus_treino.append(bônus_de_treino)
                     continue
-                elif "Alternativa" in row["perícias_do_jogador"] and row["perícia"] in perícias_alt_selecionadas:
-                    #print("Detectou Alternativa Escolhida!\n===========")
-                    perícias_treinadas.append("Treinado (alt)")
-                    bônus_treino.append(bônus_de_treino)
-                    continue
-                elif "Alternativa" in row["perícias_do_jogador"]:
-                    #print("Detectou Alternativa não Escolhida!")
-                    pass
-                elif "Opcional" in row["perícias_do_jogador"] and row["perícia"] in perícias_op_selecionadas:
+                elif row["perícia"] is not None:
+                    if "Alternativa" in row["perícias_da_classe"] and row["perícia"] in perícias_alt_selecionadas:
+                        #print("Detectou Alternativa Escolhida!\n===========")
+                        perícias_treinadas.append("Treinado (alt)")
+                        bônus_treino.append(bônus_de_treino)
+                        continue
+                elif row["perícia"] is not None:
+                    if row["perícia"] in perícias_alt_selecionadas:
+                        #print("Perícia alternativa", row["perícia"], "inválida!")
+                        pass
+                elif "Opcional" in row["perícias_da_classe"] and row["perícia"] in perícias_op_selecionadas:
                     #print("Detectou Opcional Escolhida!\n===========")
                     perícias_treinadas.append("Treinado (op)")
                     bônus_treino.append(bônus_de_treino)
                     continue
-                elif "Opcional" in row["perícias_do_jogador"]:
-                    #print("Detectou Opcional não Escolhida!")
-                    pass
+                elif row["perícia"] in perícias_op_selecionadas:
+                    #print("Perícia opcional", row["perícia"], "inválida!")
+                    continue
             if row["perícia"] in perícias_livres_selecionadas:
                 #print("Detectou Livre Escolhida!\n===========")
                 perícias_treinadas.append("Treinado (livre)")
@@ -297,6 +371,7 @@ class personagem:
         tabela_perícias_jogador["bônus_nível"] = bônus_nível
         tabela_perícias_jogador["bônus_atributo"] = bônus_atributo
         tabela_perícias_jogador["bônus_treino"] = bônus_treino
+        tabela_perícias_jogador["bônus_outro"] = [0] * len(tabela_perícias_jogador.index)
 
         tabela_perícias_jogador["bônus_total"] = [nível + atr + treino for nível, atr, treino in zip(bônus_nível, bônus_atributo, bônus_treino)]
 
@@ -306,7 +381,7 @@ class personagem:
         return(pd.DataFrame(columns = ["nome", "origem", "prioridade", "automático", "referência", "bônus_em", "valor_bônus",
                                         "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
                                         "restrição_poderes", "restrição_divindade", "restrição_perícia", "restrição_magia",
-                                        "restrição_atributo"]))
+                                        "restrição_atributo", "já_processado"]))
 
     def adiciona_linha_tabela_de_origem(self,
                                         nome,
@@ -406,7 +481,7 @@ class personagem:
             raise Exception("Método de cálculo de atributos básicos inválido!")
 
         for atributo, valor in atributos_calculados.items():
-            self.atributos.update({atributo: valor})
+            #self.atributos.update({atributo: valor})
             self.adiciona_linha_tabela_de_origem(nome = "".join(["Atributos básicos do método de ", método]),
                                                 origem = "".join([método.capitalize(), " iniciais"]),
                                                 prioridade = 1,
@@ -431,7 +506,7 @@ class personagem:
                 valor_dois_presente = True
 
         # Pegar os atributos de raça
-        tabela_raças = pd.read_csv("./tabelas/info_raças.csv")
+        tabela_raças = self.get_tabela("raças")
         atributos_raça = tabela_raças[tabela_raças["raça"] == self.raça]
         #print(atributos_raça)
 
@@ -459,7 +534,7 @@ class personagem:
             if atributo in restrição_pontos_livres:
                 self.print_aviso("Pontos livres alocados para um atributo inválido para essa raça. Pontos não foram atribuídos")
                 continue
-            self.atributos[atributo] += atributos_raça[atributo] + pontos_livres[atributo]
+            #self.atributos[atributo] += atributos_raça[atributo] + pontos_livres[atributo]
             if atributos_raça[atributo] != 0:
                 self.adiciona_linha_tabela_de_origem(nome = "".join([atributo.capitalize(), " da raça ", self.raça]),
                                                     origem = "".join(["Raça ", self.raça]),
@@ -479,8 +554,9 @@ class personagem:
                                                     automático = "Sim",
                                                     referência = referência)
 
+    # TODO: Essa função será redundante quando a "adiciona_lista_para_tabela_origem" for completa
     def aumentos_de_atributos_disponíveis(self):
-        tabela_aumento_atributo = pd.read_csv("info_poderes_atributos.csv")
+        tabela_aumento_atributo = self.get_tabela("poderes_atributos")
         tabela_aumento_atributo = tabela_aumento_atributo.sort_values(by = "prioridade", ascending = False)
 
         tabela_aumentos_válidos = self.inicializa_tabela_de_origem()
@@ -497,12 +573,13 @@ class personagem:
 
         return(tabela_aumentos_válidos)
     
+    # TODO: Essa função será semi-redundante quando a "adiciona_lista_para_tabela_origem" for completa
     def poderes_disponíveis(self):
         """
         Pegar a giga-gigante tabela de todos os poderes e fazer um subset daqueles que estão
         disponíveis para o personagem atual
         """
-        tabela_poderes = pd.read_csv("./tabelas/info_poderes.csv")
+        tabela_poderes = self.get_tabela("poderes")
         tabela_poderes = tabela_poderes.replace({float("nan"): None})
         # Ordena a tabela pela prioridade necessário para ver a restrição dos poderes
         tabela_poderes = tabela_poderes.sort_values (by = "prioridade", axis = 0, ascending = False)
@@ -561,30 +638,132 @@ class personagem:
 
         return(tabela_poderes_válidos)
 
-# Passo 1:
-teste = personagem(nome_personagem = "NOME_PERSONAGEM", jogador = "JOGADOR")
+    def get_perícias_treinadas(self):
+        if self.tabela_perícias is None:
+            raise Exception("Tentativa de acesso à tabela de perícias resultou em None")
+        lista_perícias_treinadas = self.tabela_perícias[["perícia", "treino"]]
+        lista_perícias_treinadas = lista_perícias_treinadas[lista_perícias_treinadas["treino"] != "Não Treinada"]
+        #print("lista_perícias_treinadas: ", lista_perícias_treinadas["perícia"].values)
+        return(lista_perícias_treinadas["perícia"].values)
 
-# Passo 2:
-teste.adiciona_classe({"Nobre": 11})
+    def adiciona_lista_para_tabela_origem(self, tabela_generalizada: pd.DataFrame, lista_selecionados: list):
+        """
+        Checa restrições e adiciona os poder válidos duma lista de poderes para a tabela de origem
+        lista_selecionados: uma lista dos poderes da tabela dada a serem checados e adicionados
+        tabela_generalizada: uma tabela formatada como uma tabela generalizada
+        """
 
-teste.calcula_atributos_iniciais(método = "rolagens", valores = {"for": 18, "des": 17, "int": 15, "con": 13, "sab": 8, "car": 18})
+        tabela_generalizada = tabela_generalizada.sort_values(by = "prioridade", ascending = False)
 
-teste.adiciona_raça("Humano")
+        if len(lista_selecionados) > self.num_poderes_disponíveis:
+            raise Exception("Número de poderes escolhidos para o personagem maior do que o possível")
 
-teste.adiciona_divindade("Valkaria")
+        for _, row in tabela_generalizada.iterrows():
 
-teste.adiciona_atributos_raça(pontos_livres = {"for": 0, "des": 1, "con": 1, "int": 1, "sab": 0, "car": 0})
+            if row["nome"] in lista_selecionados:
+                classe_do_poder = None
+                # Primeiro ver se há alguma restrição de classe
+                if row["restrição_classe"] is not None:
+                    # Se têm testar se a classe a qual o poder é restrito não está nas
+                    # classes do personagem, se ele não estiver, podemos parar de
+                    # processar esse poder aqui
+                    if not any(x in row["restrição_classe"] for x in self.classes.keys()):                
+                        print("Poder ", row["nome"], " não válido pois a restrição de classe ", row["restrição_classe"], " não foi cumprida")
+                        continue
+                    # Se teve um match da classe a qual o poder é restrito e as classes
+                    # do personagem, queremos saber que classe é, pois quando há uma
+                    # restrição de nível em conjunto com uma de classe, a restrição
+                    # é interpretada como "seja um inventor de nível 9" ao invés de
+                    # "seja um inventor e tenha alguma classe nível 9"
+                    else:
+                        for classe in self.classes.keys():
+                            if classe == row["restrição_classe"]:
+                                classe_do_poder = classe
 
-print("int: ", teste.get_atributo("int"))
+                # Se há restrição de nível
+                if row["restrição_nível"] is not None:
+                    # Testar a classe que a qual o poder pertence, se ela existir
+                    if classe_do_poder is not None:
+                        if self.get_nível_de_classe(classe_do_poder) < row["restrição_nível"]:
+                            print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " da classe do poder não cumprida")
+                            continue
+                    # Se não tiver classe a qual o poder pertence, testar todos os níveis de classe
+                    else:
+                        if not self.get_nível_total() >= row["restrição_nível"]:
+                            print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " não cumprida")
+                            continue
 
-teste.selecionar_perícias(perícias_alt_selecionadas = "Diplomacia",
-                          perícias_livres_selecionadas = ["Ladinagem", "Luta", "Fortitude"],
-                          perícias_op_selecionadas = ["Cavalgar", "Guerra", "Pontaria", "Jogatina"])
+                if row["restrição_divindade"] is not None:
+                    if self.divindade not in row["restrição_divindade"]:
+                        print("Poder ", row["nome"], " não válido pois a restrição de divindade ", row["restrição_divindade"], " não cumprida")
+                        continue
+                
+                if row["restrição_raça"] is not None:
+                    if self.raça not in row["restrição_raça"]:
+                        print("Poder ", row["nome"], " não válido pois a restrição de raça ", row["restrição_raça"], " não cumprida")
+                        continue
 
-print(teste.tabela_perícias)
+                if row["restrição_perícia"] is not None:
+                    if row["restrição_perícia"] not in self.get_perícias_treinadas():
+                        print("Poder ", row["nome"], " não válido pois a restrição de perícia ", row["restrição_perícia"], " não cumprida")
+                        continue
 
-#print(teste.tabela_perícias)
+                if row["restrição_atributo"] is not None:
+                    lista_stats = row["restrição_atributo"].split("|")
 
-teste.poderes_disponíveis()
+                    skip = False
 
-teste.tabela_origem.to_csv("tabela_teste.csv")
+                    for string_atr in lista_stats:
+                        atributo, valor = string_atr.split(":")
+                        if self.get_atributo(atributo) < int(valor):
+                            print("Poder ", row["nome"], " não válido pois a restrição de atributo ", row["restrição_atributo"], " não cumprida")
+                            skip = True
+
+                    if skip:
+                        continue
+
+                if row["restrição_poderes"] is not None:
+                    if row["restrição_poderes"] not in self.get_poderes_do_personagem():
+                        print("Poder ", row["nome"], " não válido pois a restrição de poderes ", row["restrição_poderes"], " não cumprida")
+                        continue
+
+                # TODO: falta restrição de magia
+
+                aux_row = pd.DataFrame.from_dict([row.to_dict()])
+                self.tabela_origem = pd.concat([self.tabela_origem, aux_row], ignore_index = True)
+
+    def interpreta_tabela_de_origem(self):
+
+        self.num_poderes_disponíveis = self.get_num_poderes()
+
+        tabela_origem = self.tabela_origem
+
+        for classe, nível in self.classes.items():
+            num_poderes_classe = len(tabela_origem.loc[(tabela_origem["restrição_classe"] == classe) & (tabela_origem["automático"] != "Sim"), "nome"].unique())
+            if num_poderes_classe > nível - 1:
+                raise Exception("Número de poderes selecionados da classe ", classe, " maior do que o permitido", num_poderes_classe, ">", nível - 1)
+
+        print("len stuff:", len(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"].unique()))
+        print(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"])
+
+        if len(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"].unique()) > self.num_poderes_disponíveis:
+            raise Exception("Número de poderes selecionados maior do que a classe e nível permitem")
+
+        tabela_origem = tabela_origem.replace({float("nan"): None})
+
+        for indx, row in tabela_origem.iterrows():
+            if row["já_processado"] is True:
+                continue
+            if row["já_processado"] is not True:
+                self.tabela_origem.at[indx, "já_processado"] = True
+
+            if row["valor_bônus"] is not None:
+                valor_bônus = str(row["valor_bônus"])
+                print("row[valor_bônus]: ", row["valor_bônus"])
+                # Esse match é pra ver se a string é apenas números
+                # assim, podemos jogar ela direto pra atribuição
+                if re.match(r"\-?([0-9])+", valor_bônus):
+                    print(row["bônus_em"], int(row["valor_bônus"]))
+                    self.adiciona_atributo(row["bônus_em"], int(row["valor_bônus"]))
+
+            #print(tabela_origem)

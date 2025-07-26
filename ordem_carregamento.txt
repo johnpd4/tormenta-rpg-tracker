@@ -30,6 +30,7 @@ Ordem de Carregar as Coisas do Personagem
 
 3. Atributos da Raça
 
+4. Perícias de Origem
 4. Perícias
 
 5.
