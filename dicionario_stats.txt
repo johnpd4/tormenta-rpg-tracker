@@ -8,7 +8,7 @@ car - Modificador de Carisma
 pv - Pontos de Vida
 pm - Pontos de mana
 defesa - Pontos de Defesa, Classe de Armadura
-resistência_magica - Resistência Mágica
+resistência_mágica - Resistência Mágica
 ataque - Pontos Bônus nas Jogadas de Ataque
 dano - Pontos Bonûs na Jogada de Dano
 penalidade_armadura - Penalidade de Armadura

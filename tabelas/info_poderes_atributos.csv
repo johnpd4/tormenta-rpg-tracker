@@ -1,25 +1,25 @@
-nome,origem,prioridade,bônus_em,efeito_bônus,valor_bônus,condição,restrição_classe,restrição_raça,restrição_nível,restrição_poderes,restrição_divindade,restrição_perícia,restrição_magia,restrição_atributo,automático,referência
-Aumento de Atributo (+1 for),Poder Geral de Classe,4,for,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 for),Poder Geral de Classe,3,for,,1,,,,5,Aumento de Atributo (+1 for),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 for),Poder Geral de Classe,2,for,,1,,,,11,Aumento de Atributo (+2 for),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 for),Poder Geral de Classe,1,for,,1,,,,17,Aumento de Atributo (+3 for),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+1 des),Poder Geral de Classe,4,des,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 des),Poder Geral de Classe,3,des,,1,,,,5,Aumento de Atributo (+1 des),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 des),Poder Geral de Classe,2,des,,1,,,,11,Aumento de Atributo (+2 des),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 des),Poder Geral de Classe,1,des,,1,,,,17,Aumento de Atributo (+3 des),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+1 con),Poder Geral de Classe,4,con,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 con),Poder Geral de Classe,3,con,,1,,,,5,Aumento de Atributo (+1 con),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 con),Poder Geral de Classe,2,con,,1,,,,11,Aumento de Atributo (+2 con),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 con),Poder Geral de Classe,1,con,,1,,,,17,Aumento de Atributo (+3 con),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+1 int),Poder Geral de Classe,4,int,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 int),Poder Geral de Classe,3,int,,1,,,,5,Aumento de Atributo (+1 int),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 int),Poder Geral de Classe,2,int,,1,,,,11,Aumento de Atributo (+2 int),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 int),Poder Geral de Classe,1,int,,1,,,,17,Aumento de Atributo (+3 int),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+1 sab),Poder Geral de Classe,4,sab,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 sab),Poder Geral de Classe,3,sab,,1,,,,5,Aumento de Atributo (+1 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 sab),Poder Geral de Classe,2,sab,,1,,,,11,Aumento de Atributo (+2 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 sab),Poder Geral de Classe,1,sab,,1,,,,17,Aumento de Atributo (+3 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+1 car),Poder Geral de Classe,4,car,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+2 car),Poder Geral de Classe,3,car,,1,,,,5,Aumento de Atributo (+1 car),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+3 car),Poder Geral de Classe,2,car,,1,,,,11,Aumento de Atributo (+2 car),,,,,,"Tormenta 20: Jogo do Ano, página 38"
-Aumento de Atributo (+4 car),Poder Geral de Classe,1,car,,1,,,,17,Aumento de Atributo (+3 car),,,,,,"Tormenta 20: Jogo do Ano, página 38"
+nome,origem,prioridade,bônus_em,efeito_bônus,valor_bônus,condição,restrição_classe,restrição_raça,restrição_nível,restrição_poderes,restrição_divindade,restrição_perícia,restrição_magia,restrição_atributo,automático,referência,já_processado
+Aumento de Atributo (+1 for),Poder Geral de Classe,4,for,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 for),Poder Geral de Classe,3,for,,1,,,,5,Aumento de Atributo (+1 for),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 for),Poder Geral de Classe,2,for,,1,,,,11,Aumento de Atributo (+2 for),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 for),Poder Geral de Classe,1,for,,1,,,,17,Aumento de Atributo (+3 for),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+1 des),Poder Geral de Classe,4,des,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 des),Poder Geral de Classe,3,des,,1,,,,5,Aumento de Atributo (+1 des),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 des),Poder Geral de Classe,2,des,,1,,,,11,Aumento de Atributo (+2 des),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 des),Poder Geral de Classe,1,des,,1,,,,17,Aumento de Atributo (+3 des),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+1 con),Poder Geral de Classe,4,con,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 con),Poder Geral de Classe,3,con,,1,,,,5,Aumento de Atributo (+1 con),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 con),Poder Geral de Classe,2,con,,1,,,,11,Aumento de Atributo (+2 con),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 con),Poder Geral de Classe,1,con,,1,,,,17,Aumento de Atributo (+3 con),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+1 int),Poder Geral de Classe,4,int,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 int),Poder Geral de Classe,3,int,,1,,,,5,Aumento de Atributo (+1 int),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 int),Poder Geral de Classe,2,int,,1,,,,11,Aumento de Atributo (+2 int),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 int),Poder Geral de Classe,1,int,,1,,,,17,Aumento de Atributo (+3 int),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+1 sab),Poder Geral de Classe,4,sab,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 sab),Poder Geral de Classe,3,sab,,1,,,,5,Aumento de Atributo (+1 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 sab),Poder Geral de Classe,2,sab,,1,,,,11,Aumento de Atributo (+2 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 sab),Poder Geral de Classe,1,sab,,1,,,,17,Aumento de Atributo (+3 sab),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+1 car),Poder Geral de Classe,4,car,,1,,,,2,,,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+2 car),Poder Geral de Classe,3,car,,1,,,,5,Aumento de Atributo (+1 car),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+3 car),Poder Geral de Classe,2,car,,1,,,,11,Aumento de Atributo (+2 car),,,,,,"Tormenta 20: Jogo do Ano, página 38",
+Aumento de Atributo (+4 car),Poder Geral de Classe,1,car,,1,,,,17,Aumento de Atributo (+3 car),,,,,,"Tormenta 20: Jogo do Ano, página 38",

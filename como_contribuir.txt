@@ -1,0 +1,12 @@
+Esse programa claramente têm um problema de ter poucos poderes programados.
+Se você quiser expandir o número de poderes que o programa lê, isso pode ser feito facilmente e sem necessidade de saber programar!
+No link abaixo tem um google sheets próprio para modificações com permissão de edição livre:
+https://docs.google.com/spreadsheets/d/1PwQJSja6JVSREcD9P8C5GZhZLmNErwf0kB-hK75uRyo/edit?usp=sharing
+
+Pode-se adicionar poderes, raças, perícias, classes, etc...
+As tabelas de perícias, classes, deuses e poderes que adicionam atributos já estão completas.
+As de poderes e raças não.
+Para todas as tabelas menos a de poderes, creio que apenas lendo os nomes das variáveis tu já vai saber como editar elas.
+Para especificamente a de poderes, olhe o arquivo "ideias_estrutura_tabela_generalizavel.txt" que explica em detalhes todas as variáveis.
+
+Obrigada por lêr :)

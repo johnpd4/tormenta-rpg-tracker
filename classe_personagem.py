@@ -18,7 +18,8 @@ class personagem:
         self.divindade = None
         self.raça = None
         self.classes = dict()
-        self.atributos = {"for": 0, "des": 0, "con": 0, "int": 0, "sab": 0, "car": 0}
+        self.atributos = self.inicializa_atributos()
+        self.atributos_combate = self.inicializa_atributos_combate()
         self.tabela_perícias = None
         self.tabela_origem = self.inicializa_tabela_de_origem()
         self.num_poderes_disponíveis = None
@@ -38,6 +39,10 @@ class personagem:
                 tabela_perícias.loc[tabela_perícias["perícia"] == atributo, "bônus_outro"] = valor_novo
                 self.tabela_perícias = tabela_perícias
                 return
+        if atributo in self.atributos_combate.keys():
+            valor_novo = self.atributos_combate.get(atributo) + valor
+            self.atributos_combate.update({atributo: valor_novo})
+            return
 
     def print_aviso(self, aviso: str):
         """
@@ -76,6 +81,8 @@ class personagem:
         Pega o nível de uma classe do personagem
         classe: str classe da qual o nível deve ser pego
         """
+        if classe.lower == "total":
+            return(self.get_nível_total())
         for classe_dict, nível in self.classes.items():
             if classe_dict == classe:
                 return(nível)
@@ -139,41 +146,86 @@ class personagem:
                 raise Exception("Níveis total de todas as classes não podem ser maiores que 20!")
 
         self.num_poderes_disponíveis = self.get_num_poderes()
-
-    def calcula_pv_das_classes(self):
-        """
-        Calcula a quantidade de pv's de um jogador.
-        Só leva em consideração a classe do jogador.
-        """
-        # Chamar a tabela de info e transformar em dicts
-        tabela_classes = self.get_tabela("classes")
-        pv_base = dict(zip(tabela_classes["classe"], tabela_classes["pv_base"]))
-        pv_por_nível = dict(zip(tabela_classes["classe"], tabela_classes["pv_por_nível"]))
-
-        # Adicionar pvs base
-        lista_classes = list(self.classes.copy())
-        pv = pv_base[lista_classes[0]] # TODO: por Constituição aqui
-
-        # Adicionar pvs de nível
-        for classe, nível in self.classes.items():
-            pv += pv_por_nível[classe] * nível # TODO: por Constituição aqui
-
-        return(pv) # TODO: Adicionar dados de atribuição daonde veio os stats
-
-    def calcula_pm_das_classes(self):
-        """
-        Calcula a quantidade de pm's de um jogador.
-        Só leva em consideração a classe do jogador.
-        """
+        
+    def adiciona_atributos_de_combate(self):
         # Chamar a tabela de info e transformar em dicts
         tabela_classes = self.get_tabela("classes")
         pm_por_nível = dict(zip(tabela_classes["classe"], tabela_classes["pm_por_nível"]))
+        classe_referência = dict(zip(tabela_classes["classe"], tabela_classes["referência"]))
+        pv_base_lista = dict(zip(tabela_classes["classe"], tabela_classes["pv_base"]))
+        pv_por_nível = dict(zip(tabela_classes["classe"], tabela_classes["pv_por_nível"]))
+        
 
-        pm = 0
+        # Adicionar pvs base
+        #lista_classes = list(self.classes.copy())
+        pv_base = pv_base_lista[self.get_classe_principal()]
+        self.adiciona_linha_tabela_de_origem(nome = "".join(["Pontos de Vida Base da Classe ", self.get_classe_principal()]),
+                                             origem = "Atributo de Constituição",
+                                             prioridade = 1,
+                                             bônus_em = "pv",
+                                             valor_bônus = pv_base,
+                                             restrição_classe = self.get_classe_principal(),
+                                             automático = "Sim",
+                                             referência = classe_referência[self.get_classe_principal()])
+
+        pv_con = self.get_atributo("con") * self.get_nível_total()
+        self.adiciona_linha_tabela_de_origem(nome = "Pontos de Vida de Constituição",
+                                             origem = "Atributo de Constituição",
+                                             prioridade = 1,
+                                             bônus_em = "pv",
+                                             valor_bônus = pv_con,
+                                             automático = "Sim",
+                                             referência = "Tormenta 20: Jogo do Ano, página 35")
+
+        pm_classe = []
+        pm_níveis = []
+        pv_classe = []
+        pv_níveis = []
+        pv_classe_referência = []
+
+        # Adicionar pvs de nível
         for classe, nível in self.classes.items():
-            pm += pm_por_nível[classe] * nível
+            pv_classe.append(classe)
+            pv_níveis.append(pv_por_nível[classe] * (nível - 1))
+            pv_classe_referência.append(classe_referência[classe])
+            pm_classe.append(classe)
+            pm_níveis.append(pm_por_nível[classe] * nível)
 
-        return(pm) # TODO: Adicionar dados de atribuição daonde veio os stats
+        for classe, pvs, pms, referência in zip(pv_classe, pv_níveis, pm_níveis, pv_classe_referência):
+            self.adiciona_linha_tabela_de_origem(nome = "".join(["Pontos de Vida da Classe ", classe]),
+                                                 origem = "".join(["Classe ", classe]),
+                                                 prioridade = 1,
+                                                 bônus_em = "pv",
+                                                 valor_bônus = pvs,
+                                                 restrição_classe = classe,
+                                                 automático = "Sim",
+                                                 referência = referência)
+            self.adiciona_linha_tabela_de_origem(nome = "".join(["Pontos de Mana da Classe ", classe]),
+                                                 origem = "".join(["Classe ", classe]),
+                                                 prioridade = 1,
+                                                 bônus_em = "pm",
+                                                 valor_bônus = pms,
+                                                 restrição_classe = classe,
+                                                 automático = "Sim",
+                                                 referência = referência)
+
+        # Adiciona armadura base
+        self.adiciona_linha_tabela_de_origem(nome = "Armadura Básica",
+                                                 origem = "Atributos Iniciais",
+                                                 prioridade = 1,
+                                                 bônus_em = "defesa",
+                                                 valor_bônus = 10,
+                                                 automático = "Sim",
+                                                 referência = "Tormenta 20: Jogo do Ano, página 106")
+
+        # Adiciona destreza na armadura
+        self.adiciona_linha_tabela_de_origem(nome = "Armadura da Destreza",
+                                                 origem = "Atributos Iniciais",
+                                                 prioridade = 1,
+                                                 bônus_em = "defesa",
+                                                 valor_bônus = self.get_atributo("des"),
+                                                 automático = "Sim",
+                                                 referência = "Tormenta 20: Jogo do Ano, página 106")
 
     def perícias_das_classes(self):
         """
@@ -262,7 +314,7 @@ class personagem:
         return(num_poderes)
 
     def get_poderes_do_personagem(self):
-        return(self.tabela_origem["nome"].unique())
+        return(self.tabela_origem["nome"].unique().tolist())
 
     def selecionar_perícias(self, perícias_op_selecionadas: list, perícias_livres_selecionadas: list, perícias_alt_selecionadas: Union[str, None] = None):
         """
@@ -382,6 +434,14 @@ class personagem:
                                         "efeito_bônus", "condição", "restrição_classe", "restrição_raça", "restrição_nível",
                                         "restrição_poderes", "restrição_divindade", "restrição_perícia", "restrição_magia",
                                         "restrição_atributo", "já_processado"]))
+
+    def inicializa_atributos(self):
+        return({"for": 0, "des": 0, "con": 0, "int": 0, "sab": 0, "car": 0})
+
+    def inicializa_atributos_combate(self):
+        return({"pv": 0, "pm": 0, "defesa": 0, "resistência_mágica": 0, "ataque": 0,
+                "dano": 0, "penalidade_armadura": 0, "deslocamento": 0, "categoria_tamanho": 0,
+                "margem_ameaça": 0, "multiplicador": 0})
 
     def adiciona_linha_tabela_de_origem(self,
                                         nome,
@@ -654,13 +714,18 @@ class personagem:
         """
 
         tabela_generalizada = tabela_generalizada.sort_values(by = "prioridade", ascending = False)
+        tabela_generalizada = tabela_generalizada.replace({float("nan"): None})
+
+        poderes_do_personagem = self.get_poderes_do_personagem()
 
         if len(lista_selecionados) > self.num_poderes_disponíveis:
             raise Exception("Número de poderes escolhidos para o personagem maior do que o possível")
 
         for _, row in tabela_generalizada.iterrows():
-
+            
             if row["nome"] in lista_selecionados:
+                print("lista_selecionados: ", lista_selecionados)
+                print("row[nome]: ", row["nome"])
                 classe_do_poder = None
                 # Primeiro ver se há alguma restrição de classe
                 if row["restrição_classe"] is not None:
@@ -689,7 +754,7 @@ class personagem:
                             continue
                     # Se não tiver classe a qual o poder pertence, testar todos os níveis de classe
                     else:
-                        if not self.get_nível_total() >= row["restrição_nível"]:
+                        if self.get_nível_total() < row["restrição_nível"]:
                             print("Poder ", row["nome"], " não válido pois a restrição de nível ", row["restrição_nível"], " não cumprida")
                             continue
 
@@ -723,13 +788,18 @@ class personagem:
                         continue
 
                 if row["restrição_poderes"] is not None:
-                    if row["restrição_poderes"] not in self.get_poderes_do_personagem():
+                    if row["restrição_poderes"] not in poderes_do_personagem:
+                        print("poderes_do_personagem", poderes_do_personagem)
                         print("Poder ", row["nome"], " não válido pois a restrição de poderes ", row["restrição_poderes"], " não cumprida")
                         continue
 
                 # TODO: falta restrição de magia
 
+                if row["nome"] not in poderes_do_personagem:
+                    poderes_do_personagem.append(row["nome"])
+                    #print(poderes_do_personagem)
                 aux_row = pd.DataFrame.from_dict([row.to_dict()])
+                #tabela_generalizada = pd.concat([tabela_generalizada, aux_row], ignore_index = True)
                 self.tabela_origem = pd.concat([self.tabela_origem, aux_row], ignore_index = True)
 
     def interpreta_tabela_de_origem(self):
@@ -743,8 +813,8 @@ class personagem:
             if num_poderes_classe > nível - 1:
                 raise Exception("Número de poderes selecionados da classe ", classe, " maior do que o permitido", num_poderes_classe, ">", nível - 1)
 
-        print("len stuff:", len(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"].unique()))
-        print(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"])
+        #print("len stuff:", len(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"].unique()))
+        #print(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"])
 
         if len(tabela_origem.loc[tabela_origem["automático"] != "Sim", "nome"].unique()) > self.num_poderes_disponíveis:
             raise Exception("Número de poderes selecionados maior do que a classe e nível permitem")
@@ -758,12 +828,42 @@ class personagem:
                 self.tabela_origem.at[indx, "já_processado"] = True
 
             if row["valor_bônus"] is not None:
-                valor_bônus = str(row["valor_bônus"])
-                print("row[valor_bônus]: ", row["valor_bônus"])
+                string_bônus = str(row["valor_bônus"])
+                # print("row[valor_bônus]: ", row["valor_bônus"])
                 # Esse match é pra ver se a string é apenas números
                 # assim, podemos jogar ela direto pra atribuição
-                if re.match(r"\-?([0-9])+", valor_bônus):
-                    print(row["bônus_em"], int(row["valor_bônus"]))
+                if re.match(r"\-?([0-9])+", string_bônus):
+                    #print(row["bônus_em"], int(row["valor_bônus"]))
                     self.adiciona_atributo(row["bônus_em"], int(row["valor_bônus"]))
+                else:
+                    exprs_completas = re.findall(r"\"(.[^\"]+)\"", string_bônus)
+                    # print("exprs_completas: ", exprs_completas)
+                    # print("len(exprs_completas): ", len(exprs_completas))
+                    vetor_expressões = []
+                    expressão_sub = []
+                    for expressão in exprs_completas:
+                        expressão_sem_aspas = re.search(r"([^\"\n]+)", expressão)
+                        variável, valor = expressão_sem_aspas.group(0).split(":")
+                        if variável == "atr":
+                            valor_bônus = self.get_atributo(valor)
+                            #print("valor_bônus: ", valor_bônus)
+                        if variável == "nível":
+                            valor_bônus = self.get_nível_de_classe(valor)
+                            #print("valor_bônus: ", valor_bônus)
+                        vetor_expressões.append(expressão)
+                        expressão_sub.append(valor_bônus)
+
+                    for expressão, sub in zip(vetor_expressões, expressão_sub):
+                        string_bônus = string_bônus.replace("".join(["\"", expressão, "\""]), str(sub))
+                        # print("string_bônus: ", string_bônus)
+                        # print("".join(["\"", expressão, "\""]))
+                        # print("expressão: ", expressão)
+                        # print("sub: ", sub)
+                    
+                    # print("eval: ", eval(string_bônus))
+                    # print("vetor_expressões: ", vetor_expressões)
+                    # print("expressão_sub: ", expressão_sub)
+
+                    self.adiciona_atributo(row["bônus_em"], int(eval(string_bônus)))
 
             #print(tabela_origem)

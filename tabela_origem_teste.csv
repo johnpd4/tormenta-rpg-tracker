@@ -1,0 +1,27 @@
+,nome,origem,prioridade,automático,referência,bônus_em,valor_bônus,efeito_bônus,condição,restrição_classe,restrição_raça,restrição_nível,restrição_poderes,restrição_divindade,restrição_perícia,restrição_magia,restrição_atributo,já_processado
+0,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",for,4,,,,,,,,,,,True
+1,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",des,3,,,,,,,,,,,True
+2,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",int,2,,,,,,,,,,,True
+3,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",con,1,,,,,,,,,,,True
+4,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",sab,-1,,,,,,,,,,,True
+5,Atributos básicos do método de rolagens,Rolagens iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 17",car,4,,,,,,,,,,,True
+6,Des de pontos livres da raça Humano,Raça Humano,1,Sim,"Tormenta 20: Jogo do Ano, página 19",des,1,,,,Humano,,,,,,,True
+7,Con de pontos livres da raça Humano,Raça Humano,1,Sim,"Tormenta 20: Jogo do Ano, página 19",con,1,,,,Humano,,,,,,,True
+8,Int de pontos livres da raça Humano,Raça Humano,1,Sim,"Tormenta 20: Jogo do Ano, página 19",int,1,,,,Humano,,,,,,,True
+9,Aumento de Atributo (+1 for),Poder Geral de Classe,4,,"Tormenta 20: Jogo do Ano, página 38",for,1,,,,,2,,,,,,True
+10,Aumento de Atributo (+2 for),Poder Geral de Classe,3,,"Tormenta 20: Jogo do Ano, página 38",for,1,,,,,5,Aumento de Atributo (+1 for),,,,,True
+11,Aumento de Atributo (+3 for),Poder Geral de Classe,2,,"Tormenta 20: Jogo do Ano, página 38",for,1,,,,,11,Aumento de Atributo (+2 for),,,,,True
+12,Pontos de Vida Base da Classe Lutador,Atributo de Constituição,1,Sim,"Tormenta 20: Jogo do Ano, página 75",pv,20.0,,,Lutador,,,,,,,,True
+13,Pontos de Vida de Constituição,Atributo de Constituição,1,Sim,"Tormenta 20: Jogo do Ano, página 35",pv,22,,,,,,,,,,,True
+14,Pontos de Vida da Classe Lutador,Classe Lutador,1,Sim,"Tormenta 20: Jogo do Ano, página 75",pv,40.0,,,Lutador,,,,,,,,True
+15,Pontos de Mana da Classe Lutador,Classe Lutador,1,Sim,"Tormenta 20: Jogo do Ano, página 75",pm,27.0,,,Lutador,,,,,,,,True
+16,Pontos de Vida da Classe Arcanista,Classe Arcanista,1,Sim,"Tormenta 20: Jogo do Ano, página 36",pv,2.0,,,Arcanista,,,,,,,,True
+17,Pontos de Mana da Classe Arcanista,Classe Arcanista,1,Sim,"Tormenta 20: Jogo do Ano, página 36",pm,12.0,,,Arcanista,,,,,,,,True
+18,Armadura Básica,Atributos Iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 106",defesa,10,,,,,,,,,,,True
+19,Armadura da Destreza,Atributos Iniciais,1,Sim,"Tormenta 20: Jogo do Ano, página 106",defesa,4,,,,,,,,,,,True
+20,Até Acertar,Poder de Lutador,0,,"Tormenta 20: Jogo do Ano, página 76",ataque,,"escolha um número X, caso acertar X atk desarmados o último têm +2*X em ataque","Escolher X, Ataque Desarmado",Lutador,,2,,,,,,True
+21,Até Acertar,Poder de Lutador,0,,"Tormenta 20: Jogo do Ano, página 76",dano,,"escolha um número X, caso acertar X atk desarmados o último têm +2*X em dano","Escolher X, Ataque Desarmado",Lutador,,2,,,,,,True
+22,Braços Calejados,Poder de Lutador,0,,"Tormenta 20: Jogo do Ano, página 76",defesa,"min(""atr:for"",  ""nível:Lutador"")",,Não usar armadura,Lutador,,2,,,,,,True
+23,Casca Grossa,Poder de Lutador,0,Sim,"Tormenta 20: Jogo do Ano, página 76",defesa,"min(""atr:con"",  ""nível:Lutador"")",,Não usar armadura pesada,Lutador,,3,,,,,,True
+24,Casca Grossa,Poder de Lutador,0,Sim,"Tormenta 20: Jogo do Ano, página 76",defesa,"max(0, math.floor((""nível:Lutador"" - 3) / 4))",,Não usar armadura pesada,Lutador,,7,,,,,,True
+25,Língua dos Becos,Poder de Lutador,0,,"Tormenta 20: Jogo do Ano, página 76",,,pague 1 pm para usar for ao invés de car num teste de car,,Lutador,,2,,,Intimidação,,for:1,True

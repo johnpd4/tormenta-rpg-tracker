@@ -6,39 +6,89 @@ Ideia de estrutura de tabela generalizavel
 A ideia é fazer uma tabela com tudo que altera os stats do arquivo de dicionário de stats.
 Isso inclui poderes, poderes de classe, poderes de classe que vem automáticamente, armas, equipamento, etc...
 Assim para criar um personagem pode-se apenas fazer um subset dessa tabela com o que é aplicável ao personagem e depois iterar sobre ela adicionando os stats.
-Cada poder pode ter mais de uma entrada na tabela, caso ele de mais de um bônus.
 Isso também ajuda quando algum poder começa a ter um efeito adicional a partir de certo nível.
 
-nome: Nome do bônus.
+IMPORTANTE: Cada poder pode ter mais de uma entrada na tabela, caso ele de mais de um bônus.
 
-origem: De onde o bônus vem. (poderes, raça, classe, etc...)
+IMPORTANTE: Apenas os campos "nome", "origem", "prioridade", "automático" e "referência" são obrigatórios, o resto pode ser deixado vazio.
+
+IMPORTANTE: Caso tenha alguma dúvida já tem exemplos na tabela https://docs.google.com/spreadsheets/d/1PwQJSja6JVSREcD9P8C5GZhZLmNErwf0kB-hK75uRyo/edit?usp=sharing
+
+IMPORTANTE: Se em algum momento nas restrições tenha vários valores que podem satisfazer a restrição 
+como, por exemplo um poder que necessite que o jogador seja ou um bardo ou um arcanista, separe ambas as condições
+(nesse caso arcanista ou bardo), com o caractere "|" (feito com Shift + \) e sem espaços.
+O exemplo de arcanista com bardo ficaria como "Arcanista|Bardo".
+Isso se extende para quantas condições extras tiverem, por exemplo o poder Coragem Total têm sua restrição de divindade "Arsenal|Khalmyr|Lin-Wu|Valkaria".
+
+nome: Nome do bônus. (Ex: "Braços Calejados", "Foco em Magia", "Aumento de Atributo", etc...)
+Esse é o nome para mostrar pro usuário, o nome no livro do poder.
+
+origem: De onde o bônus vem. (Ex: "Classe Lutador", "Poder Geral (combate)", "Raça Humano", etc...)
+Um tipo de categoria do poder, basicamente.
 
 prioridade: Prioridade ao carregar os bônus personagem. A ideia é dar maior prioridade pra coisas que mexem nos atributos principais, pois muitos outros poderes dependem disso.
+Prioridade para carregar na tabela. Poderes que aumentam atributos (for, des, con, int, sab, car) do personagem devem ter prioridade maior que 0. 
+Poderes que apenas usam os atributos devem ter prioridade 0.
+Poderes que têm pré-requisitos de outros poderes devem ter prioridade menor que a do poder pré-requesitado. Normalmente isso será um número negativo.
 
 nome_bônus: Onde o valor bônus deve ser adicionado.
+Nome do atributo em que o bônus deve ser adicionado. Uma lista completa de todos os atributos que são funcionais no momento pode ser encontrada em "dicionario_stats.txt"
 
 valor_bônus: Valor do bônus. Seria ideal poder colocar uma fórmula aqui.
+O valor de bônus que o poder dá. Pode ser uma fórmula que o python entenda.
+Funções úteis de python para serem usadas:
+max() e min(): máximo ou mínimo entre n números.
+round(): arredondar normal.
+math.ceil(): arredonda qualquer número com um decimal sempre para cima.
+math.floor(): arredonda qualquer número com um decimal sempre para baixo.
+
+Algumas variáveis também podem ser inseridas:
+"atr:for", "atr:des", "atr:con", "atr:int", "atr:sab", "atr:car" = Insere força, destreza, ... etc
+"nível:classe" = Nível de uma classe específica Ex: "nível:Lutador"
+"nível:total" = Nível total do personagem
+
+Alguns exemplos dessas fórmulas já estão na tabela, caso tenha alguma dúvida
 
 efeito_bônus: Efeito dado por algum bônus. Acho que usar só strings pra display.
+Algum efeito que não seja relacionado com os atributos do personagem. Escrever um textinho pro usuário ver que seja entendivel.
 
 condição: Condição para o bônus ser ativado.
+Condição necessária para o bônus funcionar. Não faz nada para o programa, apenas para o usuário ler.
 
 restrição_classe: Classe a qual esse bônus é restrito.
+Colocar aqui o nome da ou classes que o poder é restrito.
+Se o poder apenas pode ser usado por lutadores coloque Lutador.
+Caso tenha mais de uma classe, como lutador e arcanista coloque Arcanista|Lutador.
 
 restrição_raça: Raça a qual esse bônus é restrito.
+Colocar aqui o nome da ou raça que o poder é restrito.
+Se o poder apenas pode ser usado por humanos coloque Humano.
+Caso tenha mais de uma classe, como humano e anão coloque Humano|Anão.
 
 restrição_nível: Nível mínimo para esse bônus. Note que isso em conjunto com a restrição de classe permite ambos restringir só nível, só classe ou ambos.
+Nível mínimo para o bônus ser aplicado. Se há uma restrição de classe o nível olhado será apenas o da classe na restrição_classe
 
 restrição_poderes: Poderes pré-requisitos para poder pegar esse bônus.
+Poderes pré-requisitos. Se tiver mais que um separe com "|" assim como em restrição de classe e raça
 
 restrição_divindade: Divindade a qual esse bônus é restrito.
+Para quando um poder for concedido
 
 restrição_perícia: Perícia necessária ser treinado para ter esse bônus.
+Para quando for necessário ser treinado em uma perícia
 
-restrição_magia: Magia necessária ser treinado para ter esse bônus.
+restrição_magia: Magia necessária ser treinado para ter esse bônus. (NÃO IMPLEMENTADO AINDA)
+Para quando for necessário ter uma magia.
 
 restrição_atributo: Valor de atributo mínimo para ter esse bônus.
+Use no formato "atributo:valor" Ex: for:1, des:3, int:2, etc...
 
-automatico: Se o bônus é automáticamente dado ao se conseguir os pré-requisitos ou deve ser selecionado.
+automatico: Se o bônus é automáticamente dado ao se conseguir os pré-requisitos ou deve ser selecionado. Se o poder for automático coloque "Sim" caso não seja deixe o campo vazio.
+Alguns poderes são automaticamente concedidos ao jogador quando ele cumpre suas restrições.
+Os poderes de lutador "Briga" e "Casca Grossa" automaticamente são dados ao jogador ao chegar aos níveis 1 e 3 de lutador.
+Poderes escolhidos quando o jogador ganha um "poder de [classe]" não são automáticos, o restante que uma classe ganha, é.
+Poderes de raça são quase sempre automáticos.
+De restante acho que não tem nenhum outro poder automático.
 
 referência: Livro e página daonde a info foi tirada.
+No formato "Tormenta 20: Jogo do Ano, página 76", para o jogador poder consultar se houver alguma dúvida.
