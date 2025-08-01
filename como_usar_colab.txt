@@ -1,0 +1,19 @@
+1: Abra colab.new/
+2: Faz login no grugle
+3: Ele vai abrir um notebook com um "chunk" escrito algo tipo "Começe o seu código ou gere com IA", clica ali e cola o seguinte código
+
+!git clone https://github.com/johnpd4/tormenta-rpg-tracker
+import os
+from pathlib import Path
+os.chdir("/content/tormenta-rpg-tracker")
+
+4: Vá no ícone de pasta na esquerda da onde você colocou o código
+5: Vai ter uma pasta chamada "tormenta-rpg-tracker", entre nela
+6: Encontre o arquivo "teste_de_personagem.py" e clique duas vezes nele
+7: O código do arquivo vai abrir na direita, copie todo ele com Ctrl + A
+8: Cole o código inteiro copiado abaixo do primeiro trecho de código
+9: Mude o que quiser e execute
+NOTA: Ao colar o código de "teste_de_personagem.py" não sobrescreva o código antigo coloque em baixo
+
+Para olhar os resultados é melhor ver as tabelas salvas:
+"tabela_perícias_teste.csv" e "tabela_origem_teste.csv", clique duas vezes nela pra abrir no Colab

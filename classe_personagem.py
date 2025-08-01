@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 import math
 from typing import Union
 from pathlib import Path
@@ -44,6 +45,37 @@ class personagem:
             self.atributos_combate.update({atributo: valor_novo})
             return
 
+    def auto_rolagem_inicial(self, prioridades: list):
+        i = 1
+        tentativa = 0
+        while True:
+            dados = []
+            tentativa += 1
+            lista_atr = []
+            lista_soma = []
+            print("=============\nTentativa de rolagens ", tentativa)
+            for i in range(6):
+                roll = np.array(np.random.choice(6, 4) + 1)
+                roll.sort()
+                dados.append(roll[[1, 2, 3]])
+                print("Dados rodados pro atributo ", i+1, ":", roll)
+                print("Tira o menor: ", dados[i])
+                soma = sum(roll[[1, 2, 3]])
+                atr = math.floor(max((soma - 10) / 2, -2))
+                print("Soma e valor correspondente: ", soma, atr, "\n#")
+                lista_soma.append(soma)
+                lista_atr.append(atr)
+
+            lista_atr.sort(reverse = True)
+            lista_soma.sort(reverse = True)
+            print("Soma total dos atr: ", sum(lista_atr))
+                
+            if sum(lista_atr) >= 6:
+                print("Soma maior que 6! Atributos finais: ", lista_atr)
+                return(dict(zip(prioridades, lista_soma)))
+            else:
+                print("Soma menor que 6! Re-rolando...")
+
     def print_aviso(self, aviso: str):
         """
         Printa um aviso colorido para quando o usuário fizer algo sub-optimal
@@ -87,7 +119,16 @@ class personagem:
             if classe_dict == classe:
                 return(nível)
         return(None)
+
+    def get_lista_perícias(self):
+        return(self.get_tabela("perícias")["perícia"].tolist())
     
+    def get_lista_atributos(self):
+        return(list(self.inicializa_atributos().keys()))
+    
+    def get_lista_atributos_combate(self):
+        return(list(self.inicializa_atributos_combate().keys()))
+
     def adiciona_raça(self, raça: str):
         """
         Adiciona ou atualiza a raça do personagem
@@ -722,10 +763,10 @@ class personagem:
             raise Exception("Número de poderes escolhidos para o personagem maior do que o possível")
 
         for _, row in tabela_generalizada.iterrows():
-            
+
             if row["nome"] in lista_selecionados:
-                print("lista_selecionados: ", lista_selecionados)
-                print("row[nome]: ", row["nome"])
+                #print("lista_selecionados: ", lista_selecionados)
+                #print("row[nome]: ", row["nome"])
                 classe_do_poder = None
                 # Primeiro ver se há alguma restrição de classe
                 if row["restrição_classe"] is not None:
@@ -759,7 +800,18 @@ class personagem:
                             continue
 
                 if row["restrição_divindade"] is not None:
-                    if self.divindade not in row["restrição_divindade"]:
+                    # O primeiro poder concedido é uma freebie, tem q ver isso aqui
+                    if self.divindade in row["restrição_divindade"]:
+                        if "Poder Concedido" not in self.tabela_origem["origem"].unique():
+                            row["automático"] = "Sim"
+                        # Testar tmb se o poder já antes ganhou sim, dai botar sim dnv
+                        if row["nome"] in self.tabela_origem["nome"].unique() and row["nome"]:
+                            row_aux = self.tabela_origem[self.tabela_origem["nome"] == row["nome"]]
+                            # print("row_aux[automático]", row_aux["automático"].values)
+                            # print("'sim' in row_aux[automático]", "Sim" in row_aux["automático"].values)
+                            if "Sim" in row_aux["automático"].values:
+                                row["automático"] = "Sim"
+                    else:
                         print("Poder ", row["nome"], " não válido pois a restrição de divindade ", row["restrição_divindade"], " não cumprida")
                         continue
                 
@@ -801,6 +853,75 @@ class personagem:
                 aux_row = pd.DataFrame.from_dict([row.to_dict()])
                 #tabela_generalizada = pd.concat([tabela_generalizada, aux_row], ignore_index = True)
                 self.tabela_origem = pd.concat([self.tabela_origem, aux_row], ignore_index = True)
+
+    def adiciona_ao_sabor_do_destino(self, lista_escolhas: list()):
+        """
+        Adiciona especificamente o poder "Ao Sabor do Destino"
+        """
+
+        if self.get_nível_total() < 6:
+            raise Exception("Nível muito baixo para adicionar Ao Sabor do Destino!")
+
+        if len(lista_escolhas) != len(set(lista_escolhas)):
+            raise Exception("Lista do poder Ao Sabor do Destino tem valores duplicados, o que não deveria ser possível!")
+
+        i = 6
+        cont_pra_lista = 0
+
+        while i <= self.get_nível_total():
+            # Se o mod de 5 é 1 é 6, 11, 16 e são níveis q dão perícia
+            if i % 5 == 1:
+                if lista_escolhas[cont_pra_lista] not in self.get_lista_perícias():
+                    raise Exception("O valor encontrado no índice", cont_pra_lista, "da lista de bônus para o poder Ao Sabor do Destino não é uma perícia quando deveria ser!")
+
+                self.adiciona_linha_tabela_de_origem(nome = "Ao Sabor do Destino",
+                                                     origem = "Poderes de Destino",
+                                                     prioridade = 1,
+                                                     automático = "Não",
+                                                     referência = "Tormenta 20: Jogo do Ano, página 130",
+                                                     bônus_em = lista_escolhas[cont_pra_lista],
+                                                     valor_bônus = 2,
+                                                     restrição_nível = i,
+                                                     condição = "Não usar itens mágicos")
+                cont_pra_lista += 1
+            # Se o mod de 5 é 2 é 7, 12, 17 e são níveis q dão armadura
+            if i % 5 == 2:
+                self.adiciona_linha_tabela_de_origem(nome = "Ao Sabor do Destino",
+                                                     origem = "Poderes de Destino",
+                                                     prioridade = 1,
+                                                     automático = "Não",
+                                                     referência = "Tormenta 20: Jogo do Ano, página 130",
+                                                     bônus_em = "defesa",
+                                                     valor_bônus = 1,
+                                                     restrição_nível = i,
+                                                     condição = "Não usar itens mágicos")
+            # Se o mod de 5 é 3 é 8, 13, 18 e são níveis q dão dano
+            if i % 5 == 3:
+                self.adiciona_linha_tabela_de_origem(nome = "Ao Sabor do Destino",
+                                                     origem = "Poderes de Destino",
+                                                     prioridade = 1,
+                                                     automático = "Não",
+                                                     referência = "Tormenta 20: Jogo do Ano, página 130",
+                                                     bônus_em = "dano",
+                                                     valor_bônus = 1,
+                                                     restrição_nível = i,
+                                                     condição = "Não usar itens mágicos")
+            # Se o mod de 5 é 4 é 9, 14, 19 e são níveis q dão atributos
+            if i % 5 == 4:
+                if lista_escolhas[cont_pra_lista] not in self.get_lista_atributos():
+                    raise Exception("O valor encontrado no índice", cont_pra_lista, "da lista de bônus para o poder Ao Sabor do Destino não é um atributo quando deveria ser!")
+                self.adiciona_linha_tabela_de_origem(nome = "Ao Sabor do Destino",
+                                                     origem = "Poderes de Destino",
+                                                     prioridade = 1,
+                                                     automático = "Não",
+                                                     referência = "Tormenta 20: Jogo do Ano, página 130",
+                                                     bônus_em = lista_escolhas[cont_pra_lista],
+                                                     valor_bônus = 1,
+                                                     restrição_nível = i,
+                                                     condição = "Não usar itens mágicos")
+                cont_pra_lista += 1
+
+            i += 1
 
     def interpreta_tabela_de_origem(self):
 
@@ -865,5 +986,3 @@ class personagem:
                     # print("expressão_sub: ", expressão_sub)
 
                     self.adiciona_atributo(row["bônus_em"], int(eval(string_bônus)))
-
-            #print(tabela_origem)

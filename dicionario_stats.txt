@@ -8,44 +8,50 @@ car - Modificador de Carisma
 pv - Pontos de Vida
 pm - Pontos de mana
 defesa - Pontos de Defesa, Classe de Armadura
-resistência_mágica - Resistência Mágica
+rd - Redução de Dano
 ataque - Pontos Bônus nas Jogadas de Ataque
 dano - Pontos Bonûs na Jogada de Dano
 penalidade_armadura - Penalidade de Armadura
 deslocamento - Deslocamento
 categoria_tamanho - Categoria de tamanho
+passo - Modificação no Passo de uma Arma Usada
 margem_ameaça - Margem de Ameaça
 multiplicador - Multiplicador de Crítico
+resistência_mágica - Resistência Mágica
+resistência_medo - Resistência a Medo
+resistência_mental - Resistência a Efeitos com tag Mental
+
 
 número_poderes - Número de Poderes
 
+perícias_[atributo] - Bônus em todas as perícias que usam [atributo]
 bonus_pericia_treinada - Bônus de Treino para Perícias
-acrobacia - Pontos na Perícia de Acrobacia
-adestramento – Pontos na Perícia de Adestramento
-atletismo – Pontos na Perícia de Atletismo
-atuação – Pontos na Perícia de Atuação
-cavalgar – Pontos na Perícia de Cavalgar
-conhecimento – Pontos na Perícia de Conhecimento
-cura – Pontos na Perícia de Cura
-diplomacia – Pontos na Perícia de Diplomacia
-enganação – Pontos na Perícia de Enganação
-fortitude – Pontos na Perícia de Fortitude
-furtividade – Pontos na Perícia de Furtividade
-guerra – Pontos na Perícia de Guerra
-iniciativa – Pontos na Perícia de Iniciativa
-intimidação – Pontos na Perícia de Intimidação
-intuição – Pontos na Perícia de Intuição
-investigação – Pontos na Perícia de Investigação
-jogatina – Pontos na Perícia de Jogatina
-ladinagem – Pontos na Perícia de Ladinagem
-luta – Pontos na Perícia de Luta
-misticismo – Pontos na Perícia de Misticismo
-nobreza – Pontos na Perícia de Nobreza
-ofício – Pontos na Perícia de Ofício
-percepção – Pontos na Perícia de Percepção
-pilotagem – Pontos na Perícia de Pilotagem
-pontaria – Pontos na Perícia de Pontaria
-reflexos – Pontos na Perícia de Reflexos
-religião – Pontos na Perícia de Religião
-sobrevivência – Pontos na Perícia de Sobrevivência
-vontade – Pontos na Perícia de Vontade
+Acrobacia - Pontos na Perícia de Acrobacia
+Adestramento – Pontos na Perícia de Adestramento
+Atletismo – Pontos na Perícia de Atletismo
+Atuação – Pontos na Perícia de Atuação
+Cavalgar – Pontos na Perícia de Cavalgar
+Conhecimento – Pontos na Perícia de Conhecimento
+Cura – Pontos na Perícia de Cura
+Diplomacia – Pontos na Perícia de Diplomacia
+Enganação – Pontos na Perícia de Enganação
+Fortitude – Pontos na Perícia de Fortitude
+Furtividade – Pontos na Perícia de Furtividade
+Guerra – Pontos na Perícia de Guerra
+Iniciativa – Pontos na Perícia de Iniciativa
+Intimidação – Pontos na Perícia de Intimidação
+Intuição – Pontos na Perícia de Intuição
+Investigação – Pontos na Perícia de Investigação
+Jogatina – Pontos na Perícia de Jogatina
+Ladinagem – Pontos na Perícia de Ladinagem
+Luta – Pontos na Perícia de Luta
+Misticismo – Pontos na Perícia de Misticismo
+Nobreza – Pontos na Perícia de Nobreza
+Ofício – Pontos na Perícia de Ofício
+Percepção – Pontos na Perícia de Percepção
+Pilotagem – Pontos na Perícia de Pilotagem
+Pontaria – Pontos na Perícia de Pontaria
+Reflexos – Pontos na Perícia de Reflexos
+Religião – Pontos na Perícia de Religião
+Sobrevivência – Pontos na Perícia de Sobrevivência
+Vontade – Pontos na Perícia de Vontade
